@@ -1,0 +1,266 @@
+{
+  "logistic_regression": {
+    "test_split": {
+      "accuracy": 0.848,
+      "f1_macro": 0.8235,
+      "precision_macro": 0.8441,
+      "recall_macro": 0.809,
+      "confusion_matrix": [
+        [
+          72,
+          38,
+          0
+        ],
+        [
+          17,
+          285,
+          10
+        ],
+        [
+          0,
+          11,
+          67
+        ]
+      ],
+      "classification_report": {
+        "short": {
+          "precision": 0.8089887640449438,
+          "recall": 0.6545454545454545,
+          "f1-score": 0.7236180904522613,
+          "support": 110.0
+        },
+        "medium": {
+          "precision": 0.8532934131736527,
+          "recall": 0.9134615384615384,
+          "f1-score": 0.8823529411764706,
+          "support": 312.0
+        },
+        "long": {
+          "precision": 0.8701298701298701,
+          "recall": 0.8589743589743589,
+          "f1-score": 0.864516129032258,
+          "support": 78.0
+        },
+        "accuracy": 0.848,
+        "macro avg": {
+          "precision": 0.8441373491161555,
+          "recall": 0.8089937839937841,
+          "f1-score": 0.8234957202203299,
+          "support": 500.0
+        },
+        "weighted avg": {
+          "precision": 0.8461728776505066,
+          "recall": 0.848,
+          "f1-score": 0.8446487313226474,
+          "support": 500.0
+        }
+      }
+    },
+    "cross_validation": {
+      "accuracy": {
+        "mean": 0.84,
+        "std": 0.0046,
+        "fold_scores": [
+          0.832,
+          0.846,
+          0.84,
+          0.842,
+          0.84
+        ]
+      },
+      "f1_macro": {
+        "mean": 0.8205,
+        "std": 0.008,
+        "fold_scores": [
+          0.8081,
+          0.8322,
+          0.8239,
+          0.8166,
+          0.8218
+        ]
+      },
+      "precision_macro": {
+        "mean": 0.8316,
+        "std": 0.0046,
+        "fold_scores": [
+          0.8232,
+          0.8345,
+          0.8362,
+          0.8334,
+          0.8306
+        ]
+      },
+      "recall_macro": {
+        "mean": 0.8128,
+        "std": 0.011,
+        "fold_scores": [
+          0.799,
+          0.8312,
+          0.8133,
+          0.8045,
+          0.8161
+        ]
+      }
+    }
+  },
+  "random_forest": {
+    "test_split": {
+      "accuracy": 0.834,
+      "f1_macro": 0.8104,
+      "precision_macro": 0.821,
+      "recall_macro": 0.804,
+      "confusion_matrix": [
+        [
+          70,
+          40,
+          0
+        ],
+        [
+          22,
+          278,
+          12
+        ],
+        [
+          0,
+          9,
+          69
+        ]
+      ],
+      "classification_report": {
+        "short": {
+          "precision": 0.7608695652173914,
+          "recall": 0.6363636363636364,
+          "f1-score": 0.693069306930693,
+          "support": 110.0
+        },
+        "medium": {
+          "precision": 0.8501529051987767,
+          "recall": 0.8910256410256411,
+          "f1-score": 0.8701095461658842,
+          "support": 312.0
+        },
+        "long": {
+          "precision": 0.8518518518518519,
+          "recall": 0.8846153846153846,
+          "f1-score": 0.8679245283018868,
+          "support": 78.0
+        },
+        "accuracy": 0.834,
+        "macro avg": {
+          "precision": 0.8209581074226732,
+          "recall": 0.804001554001554,
+          "f1-score": 0.8103677937994881,
+          "support": 500.0
+        },
+        "weighted avg": {
+          "precision": 0.8307756060807517,
+          "recall": 0.834,
+          "f1-score": 0.8308198307473587,
+          "support": 500.0
+        }
+      }
+    },
+    "cross_validation": {
+      "accuracy": {
+        "mean": 0.832,
+        "std": 0.0101,
+        "fold_scores": [
+          0.82,
+          0.84,
+          0.836,
+          0.82,
+          0.844
+        ]
+      },
+      "f1_macro": {
+        "mean": 0.8169,
+        "std": 0.0139,
+        "fold_scores": [
+          0.8044,
+          0.8262,
+          0.8259,
+          0.7962,
+          0.8315
+        ]
+      },
+      "precision_macro": {
+        "mean": 0.8178,
+        "std": 0.0116,
+        "fold_scores": [
+          0.8053,
+          0.8305,
+          0.819,
+          0.8039,
+          0.8303
+        ]
+      },
+      "recall_macro": {
+        "mean": 0.8166,
+        "std": 0.0174,
+        "fold_scores": [
+          0.8035,
+          0.8228,
+          0.8337,
+          0.7896,
+          0.8332
+        ]
+      }
+    }
+  },
+  "dataset": {
+    "rows": 2500,
+    "class_distribution": {
+      "long": 0.1552,
+      "medium": 0.6236,
+      "short": 0.2212
+    }
+  },
+  "selected_model": {
+    "name": "logistic_regression",
+    "artifact": "model.joblib",
+    "feature_order_artifact": "features.json",
+    "permutation_importance": [
+      {
+        "feature": "fracture_type",
+        "importance": 0.7565
+      },
+      {
+        "feature": "age",
+        "importance": 0.0678
+      },
+      {
+        "feature": "bone_affected",
+        "importance": 0.0656
+      },
+      {
+        "feature": "nutrition_score",
+        "importance": 0.0406
+      },
+      {
+        "feature": "rehab_adherence",
+        "importance": 0.0244
+      },
+      {
+        "feature": "osteoporosis",
+        "importance": 0.0224
+      },
+      {
+        "feature": "diabetes",
+        "importance": 0.0114
+      },
+      {
+        "feature": "bmi",
+        "importance": 0.0069
+      },
+      {
+        "feature": "smoker",
+        "importance": 0.0044
+      }
+    ],
+    "week_ranges": {
+      "short": "0-6 weeks",
+      "medium": "6-16 weeks",
+      "long": "16+ weeks"
+    }
+  }
+}

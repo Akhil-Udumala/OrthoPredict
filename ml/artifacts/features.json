@@ -1,0 +1,11 @@
+[
+  "age",
+  "fracture_type",
+  "bone_affected",
+  "nutrition_score",
+  "rehab_adherence",
+  "bmi",
+  "diabetes",
+  "osteoporosis",
+  "smoker"
+]
