@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orthopredict.local/schema.json",
+  "title": "OrthoPredict API Schema",
+  "description": "Strict shared contract for the OrthoPredict v1 prediction request and response.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["age","fracture_type","bone_affected","nutrition_score","rehab_adherence","bmi","diabetes","osteoporosis","smoker"],
+  "properties": {
+    "age": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 110
+    },
+    "fracture_type": {
+      "type": "string",
+      "enum": ["hairline","stress","simple","compound","comminuted"]
+    },
+    "bone_affected": {
+      "type": "string",
+      "enum": ["femur","tibia","radius","ulna","humerus","clavicle","rib","foot","wrist","other"]
+    },
+    "nutrition_score": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "rehab_adherence": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "bmi": {
+      "type": "number",
+      "minimum": 10.0,
+      "maximum": 60.0
+    },
+    "diabetes": {
+      "type": "boolean"
+    },
+    "osteoporosis": {
+      "type": "boolean"
+    },
+    "smoker": {
+      "type": "boolean"
+    }
+  },
+  "$defs": {
+    "prediction_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category","week_range","confidence","probabilities","top_features","rehab_tips"],
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": ["short","medium","long"]
+        },
+        "week_range": {
+          "type": "string",
+          "enum": ["0-6 weeks","6-16 weeks","16+ weeks"]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "probabilities": {
+          "type": "object",
+          "required": ["short","medium","long"],
+          "additionalProperties": false,
+          "properties": {
+            "short": { "type": "number" },
+            "medium": { "type": "number" },
+            "long": { "type": "number" }
+          }
+        },
+        "top_features": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "required": ["feature","importance"],
+            "properties": {
+              "feature": {
+                "type": "string",
+                "enum": ["age","fracture_type","bone_affected","nutrition_score","rehab_adherence","bmi","diabetes","osteoporosis","smoker"]
+              },
+              "importance": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+              }
+            }
+          }
+        },
+        "rehab_tips": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}
