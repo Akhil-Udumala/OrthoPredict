@@ -33,12 +33,6 @@ class PredictionCategory(str, Enum):
     LONG = "long"
 
 
-class WeekRange(str, Enum):
-    SHORT = "0-6 weeks"
-    MEDIUM = "6-16 weeks"
-    LONG = "16+ weeks"
-
-
 class FeatureName(str, Enum):
     AGE = "age"
     FRACTURE_TYPE = "fracture_type"
@@ -49,6 +43,11 @@ class FeatureName(str, Enum):
     DIABETES = "diabetes"
     OSTEOPOROSIS = "osteoporosis"
     SMOKER = "smoker"
+
+
+class DriverDirection(str, Enum):
+    HIGHER = "higher"
+    LOWER = "lower"
 
 
 class PredictionRequest(BaseModel):
@@ -108,32 +107,68 @@ class TopFeature(BaseModel):
         return float(value)
 
 
+class DriverSignal(BaseModel):
+    model_config = ConfigDict(extra="forbid", use_enum_values=True)
+
+    feature: FeatureName
+    effect_weeks: Annotated[float, Field(ge=0.0)]
+    direction: DriverDirection
+
+    @field_validator("effect_weeks", mode="before")
+    @classmethod
+    def validate_effect_type(cls, value: object) -> float:
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise TypeError("effect_weeks must be numeric.")
+        return float(value)
+
+
 class PredictionResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", use_enum_values=True)
 
+    predicted_weeks: Annotated[float, Field(gt=0.0)]
+    week_range_low: Annotated[float, Field(ge=0.0)]
+    week_range_high: Annotated[float, Field(ge=0.0)]
     category: PredictionCategory
-    week_range: WeekRange
+    week_range: str
     confidence: Annotated[float, Field(ge=0.0, le=1.0)]
+    uncertainty_weeks: Annotated[float, Field(ge=0.0)]
     probabilities: ClassProbabilities
     top_features: Annotated[list[TopFeature], Field(min_length=3, max_length=3)]
+    driver_signals: Annotated[list[DriverSignal], Field(min_length=3, max_length=3)]
     rehab_tips: Annotated[list[str], Field(min_length=3, max_length=3)]
 
-    @field_validator("confidence", mode="before")
+    @field_validator(
+        "predicted_weeks",
+        "week_range_low",
+        "week_range_high",
+        "confidence",
+        "uncertainty_weeks",
+        mode="before",
+    )
     @classmethod
-    def validate_confidence_type(cls, value: object) -> float:
+    def validate_numeric_type(cls, value: object) -> float:
         if isinstance(value, bool) or not isinstance(value, (int, float)):
-            raise TypeError("confidence must be numeric.")
+            raise TypeError("Prediction values must be numeric.")
         return float(value)
 
     @model_validator(mode="after")
     def validate_response_consistency(self) -> "PredictionResponse":
-        expected_week_ranges = {
-            PredictionCategory.SHORT.value: WeekRange.SHORT.value,
-            PredictionCategory.MEDIUM.value: WeekRange.MEDIUM.value,
-            PredictionCategory.LONG.value: WeekRange.LONG.value,
-        }
-        if expected_week_ranges[self.category] != self.week_range:
-            raise ValueError("week_range does not match the predicted category.")
+        derived_category = (
+            PredictionCategory.SHORT.value
+            if self.predicted_weeks <= 6.0
+            else PredictionCategory.MEDIUM.value
+            if self.predicted_weeks <= 16.0
+            else PredictionCategory.LONG.value
+        )
+        if derived_category != self.category:
+            raise ValueError("category must be derived from predicted_weeks.")
+
+        if not (self.week_range_low <= self.predicted_weeks <= self.week_range_high):
+            raise ValueError("predicted_weeks must sit inside the personalized week range.")
+
+        expected_range = f"{self.week_range_low:.1f}-{self.week_range_high:.1f} weeks"
+        if self.week_range != expected_range:
+            raise ValueError("week_range must match the personalized low/high bounds.")
 
         max_probability = max(
             self.probabilities.short,
@@ -142,6 +177,16 @@ class PredictionResponse(BaseModel):
         )
         if round(self.confidence, 4) != round(max_probability, 4):
             raise ValueError("confidence must match the highest class probability.")
+
+        expected_uncertainty = round(
+            max(
+                self.predicted_weeks - self.week_range_low,
+                self.week_range_high - self.predicted_weeks,
+            ),
+            1,
+        )
+        if round(self.uncertainty_weeks, 1) != expected_uncertainty:
+            raise ValueError("uncertainty_weeks must match the personalized week range.")
 
         return self
 

@@ -6,8 +6,10 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 DOCS_DIR = ROOT_DIR / "docs"
+DATA_DIR = ROOT_DIR / "data"
 ML_ARTIFACTS_DIR = ROOT_DIR / "ml" / "artifacts"
 SCHEMA_PATH = DOCS_DIR / "schema.json"
+DATASET_PATH = DATA_DIR / "synthetic_bone_fracture_healing.csv"
 MODEL_PATH = ML_ARTIFACTS_DIR / "model.joblib"
 FEATURES_PATH = ML_ARTIFACTS_DIR / "features.json"
 METRICS_PATH = ML_ARTIFACTS_DIR / "metrics.json"

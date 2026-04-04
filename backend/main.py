@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="OrthoPredict Backend API",
-    version="1.0.0",
+    version="2.0.0",
     description="FastAPI backend for bone fracture healing time prediction.",
     lifespan=lifespan,
 )

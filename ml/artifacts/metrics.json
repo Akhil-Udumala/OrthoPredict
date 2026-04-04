@@ -1,266 +1,264 @@
 {
-  "logistic_regression": {
+  "linear_regression": {
     "test_split": {
-      "accuracy": 0.848,
-      "f1_macro": 0.8235,
-      "precision_macro": 0.8441,
-      "recall_macro": 0.809,
-      "confusion_matrix": [
-        [
-          72,
-          38,
-          0
-        ],
-        [
-          17,
-          285,
-          10
-        ],
-        [
-          0,
-          11,
-          67
-        ]
-      ],
-      "classification_report": {
-        "short": {
-          "precision": 0.8089887640449438,
-          "recall": 0.6545454545454545,
-          "f1-score": 0.7236180904522613,
-          "support": 110.0
-        },
-        "medium": {
-          "precision": 0.8532934131736527,
-          "recall": 0.9134615384615384,
-          "f1-score": 0.8823529411764706,
-          "support": 312.0
-        },
-        "long": {
-          "precision": 0.8701298701298701,
-          "recall": 0.8589743589743589,
-          "f1-score": 0.864516129032258,
-          "support": 78.0
-        },
-        "accuracy": 0.848,
-        "macro avg": {
-          "precision": 0.8441373491161555,
-          "recall": 0.8089937839937841,
-          "f1-score": 0.8234957202203299,
-          "support": 500.0
-        },
-        "weighted avg": {
-          "precision": 0.8461728776505066,
-          "recall": 0.848,
-          "f1-score": 0.8446487313226474,
-          "support": 500.0
-        }
-      }
+      "mae": 1.5898,
+      "rmse": 1.9061,
+      "r2": 0.8689,
+      "category_accuracy": 0.8133,
+      "category_f1_macro": 0.7873
     },
     "cross_validation": {
-      "accuracy": {
-        "mean": 0.84,
-        "std": 0.0046,
+      "mae": {
+        "mean": 1.6303,
+        "std": 0.0309,
         "fold_scores": [
-          0.832,
-          0.846,
-          0.84,
-          0.842,
-          0.84
+          1.6539,
+          1.6594,
+          1.598,
+          1.5874,
+          1.6527
         ]
       },
-      "f1_macro": {
-        "mean": 0.8205,
-        "std": 0.008,
+      "rmse": {
+        "mean": 1.9383,
+        "std": 0.0463,
         "fold_scores": [
-          0.8081,
-          0.8322,
-          0.8239,
-          0.8166,
-          0.8218
+          1.9335,
+          2.0162,
+          1.8767,
+          1.9133,
+          1.952
         ]
       },
-      "precision_macro": {
-        "mean": 0.8316,
-        "std": 0.0046,
+      "r2": {
+        "mean": 0.8649,
+        "std": 0.0044,
         "fold_scores": [
-          0.8232,
-          0.8345,
-          0.8362,
-          0.8334,
-          0.8306
+          0.8627,
+          0.8593,
+          0.8725,
+          0.8663,
+          0.8637
         ]
       },
-      "recall_macro": {
-        "mean": 0.8128,
-        "std": 0.011,
+      "category_accuracy": {
+        "mean": 0.8407,
+        "std": 0.0093,
         "fold_scores": [
-          0.799,
-          0.8312,
-          0.8133,
-          0.8045,
-          0.8161
-        ]
-      }
-    }
-  },
-  "random_forest": {
-    "test_split": {
-      "accuracy": 0.834,
-      "f1_macro": 0.8104,
-      "precision_macro": 0.821,
-      "recall_macro": 0.804,
-      "confusion_matrix": [
-        [
-          70,
-          40,
-          0
-        ],
-        [
-          22,
-          278,
-          12
-        ],
-        [
-          0,
-          9,
-          69
-        ]
-      ],
-      "classification_report": {
-        "short": {
-          "precision": 0.7608695652173914,
-          "recall": 0.6363636363636364,
-          "f1-score": 0.693069306930693,
-          "support": 110.0
-        },
-        "medium": {
-          "precision": 0.8501529051987767,
-          "recall": 0.8910256410256411,
-          "f1-score": 0.8701095461658842,
-          "support": 312.0
-        },
-        "long": {
-          "precision": 0.8518518518518519,
-          "recall": 0.8846153846153846,
-          "f1-score": 0.8679245283018868,
-          "support": 78.0
-        },
-        "accuracy": 0.834,
-        "macro avg": {
-          "precision": 0.8209581074226732,
-          "recall": 0.804001554001554,
-          "f1-score": 0.8103677937994881,
-          "support": 500.0
-        },
-        "weighted avg": {
-          "precision": 0.8307756060807517,
-          "recall": 0.834,
-          "f1-score": 0.8308198307473587,
-          "support": 500.0
-        }
-      }
-    },
-    "cross_validation": {
-      "accuracy": {
-        "mean": 0.832,
-        "std": 0.0101,
-        "fold_scores": [
-          0.82,
-          0.84,
-          0.836,
-          0.82,
-          0.844
+          0.8483,
+          0.8517,
+          0.8333,
+          0.8433,
+          0.8267
         ]
       },
-      "f1_macro": {
-        "mean": 0.8169,
-        "std": 0.0139,
-        "fold_scores": [
-          0.8044,
-          0.8262,
-          0.8259,
-          0.7962,
-          0.8315
-        ]
-      },
-      "precision_macro": {
-        "mean": 0.8178,
+      "category_f1_macro": {
+        "mean": 0.8068,
         "std": 0.0116,
         "fold_scores": [
-          0.8053,
-          0.8305,
-          0.819,
-          0.8039,
-          0.8303
-        ]
-      },
-      "recall_macro": {
-        "mean": 0.8166,
-        "std": 0.0174,
-        "fold_scores": [
-          0.8035,
-          0.8228,
-          0.8337,
-          0.7896,
-          0.8332
+          0.8186,
+          0.8163,
+          0.799,
+          0.812,
+          0.7879
         ]
       }
+    },
+    "monotonicity": {
+      "nutrition_worsen_violations": 0,
+      "rehab_worsen_violations": 0,
+      "total_checks": 291,
+      "violation_rate": 0.0
+    }
+  },
+  "random_forest_regressor": {
+    "test_split": {
+      "mae": 0.9397,
+      "rmse": 1.2519,
+      "r2": 0.9434,
+      "category_accuracy": 0.8767,
+      "category_f1_macro": 0.8445
+    },
+    "cross_validation": {
+      "mae": {
+        "mean": 0.9529,
+        "std": 0.0212,
+        "fold_scores": [
+          0.9257,
+          0.982,
+          0.9346,
+          0.9516,
+          0.9707
+        ]
+      },
+      "rmse": {
+        "mean": 1.2512,
+        "std": 0.0944,
+        "fold_scores": [
+          1.1611,
+          1.424,
+          1.1727,
+          1.2639,
+          1.2344
+        ]
+      },
+      "r2": {
+        "mean": 0.9435,
+        "std": 0.0076,
+        "fold_scores": [
+          0.9505,
+          0.9298,
+          0.9502,
+          0.9417,
+          0.9455
+        ]
+      },
+      "category_accuracy": {
+        "mean": 0.8703,
+        "std": 0.0155,
+        "fold_scores": [
+          0.8717,
+          0.9,
+          0.8617,
+          0.86,
+          0.8583
+        ]
+      },
+      "category_f1_macro": {
+        "mean": 0.833,
+        "std": 0.0192,
+        "fold_scores": [
+          0.8332,
+          0.8697,
+          0.8214,
+          0.8241,
+          0.8164
+        ]
+      }
+    },
+    "monotonicity": {
+      "nutrition_worsen_violations": 0,
+      "rehab_worsen_violations": 0,
+      "total_checks": 291,
+      "violation_rate": 0.0
     }
   },
   "dataset": {
-    "rows": 2500,
-    "class_distribution": {
-      "long": 0.1552,
-      "medium": 0.6236,
-      "short": 0.2212
+    "rows": 3000,
+    "weeks_summary": {
+      "min": 2.0,
+      "median": 9.7,
+      "mean": 11.15,
+      "max": 26.4
+    },
+    "category_distribution": {
+      "long": 0.218,
+      "medium": 0.6227,
+      "short": 0.1593
     }
   },
   "selected_model": {
-    "name": "logistic_regression",
+    "name": "random_forest_regressor",
     "artifact": "model.joblib",
     "feature_order_artifact": "features.json",
-    "permutation_importance": [
-      {
-        "feature": "fracture_type",
-        "importance": 0.7565
-      },
-      {
-        "feature": "age",
-        "importance": 0.0678
-      },
-      {
-        "feature": "bone_affected",
-        "importance": 0.0656
-      },
-      {
-        "feature": "nutrition_score",
-        "importance": 0.0406
-      },
-      {
-        "feature": "rehab_adherence",
-        "importance": 0.0244
-      },
-      {
-        "feature": "osteoporosis",
-        "importance": 0.0224
-      },
-      {
-        "feature": "diabetes",
-        "importance": 0.0114
-      },
-      {
-        "feature": "bmi",
-        "importance": 0.0069
-      },
-      {
-        "feature": "smoker",
-        "importance": 0.0044
-      }
-    ],
+    "category_thresholds": {
+      "short_max_weeks": 6.0,
+      "medium_max_weeks": 16.0
+    },
     "week_ranges": {
       "short": "0-6 weeks",
       "medium": "6-16 weeks",
       "long": "16+ weeks"
+    },
+    "calibration": {
+      "target_interval_coverage": 0.8,
+      "sigma_floor": 1.1356,
+      "interval_half_width_floor": 1.4553,
+      "residual_quantiles": {
+        "median_absolute_error": 0.7926,
+        "p80_absolute_error": 1.4553,
+        "p90_absolute_error": 1.9113
+      }
+    },
+    "reference_profile": {
+      "age": 43,
+      "fracture_type": "simple",
+      "bone_affected": "tibia",
+      "nutrition_score": 6,
+      "rehab_adherence": 6,
+      "bmi": 25.7,
+      "diabetes": false,
+      "osteoporosis": false,
+      "smoker": false
+    },
+    "global_feature_importance": [
+      {
+        "feature": "fracture_type",
+        "importance": 0.6394
+      },
+      {
+        "feature": "rehab_adherence",
+        "importance": 0.1748
+      },
+      {
+        "feature": "nutrition_score",
+        "importance": 0.0966
+      },
+      {
+        "feature": "age",
+        "importance": 0.0342
+      },
+      {
+        "feature": "bone_affected",
+        "importance": 0.0228
+      },
+      {
+        "feature": "bmi",
+        "importance": 0.019
+      },
+      {
+        "feature": "smoker",
+        "importance": 0.0049
+      },
+      {
+        "feature": "osteoporosis",
+        "importance": 0.0046
+      },
+      {
+        "feature": "diabetes",
+        "importance": 0.0037
+      }
+    ],
+    "artifact_contract": {
+      "model.joblib": "Serialized regression bundle with point model, ensemble models, thresholds, and calibration.",
+      "features.json": "Ordered request feature list that matches docs/schema.json exactly.",
+      "metrics.json": "Regression, derived-category, monotonicity, calibration, and artifact contract metadata."
+    },
+    "prediction_contract": {
+      "request_fields": [
+        "age",
+        "fracture_type",
+        "bone_affected",
+        "nutrition_score",
+        "rehab_adherence",
+        "bmi",
+        "diabetes",
+        "osteoporosis",
+        "smoker"
+      ],
+      "response_fields": [
+        "predicted_weeks",
+        "week_range_low",
+        "week_range_high",
+        "category",
+        "week_range",
+        "confidence",
+        "uncertainty_weeks",
+        "probabilities",
+        "top_features",
+        "driver_signals",
+        "rehab_tips"
+      ]
     }
   }
 }

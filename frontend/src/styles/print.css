@@ -1,0 +1,54 @@
+@media print {
+  body {
+    background: #ffffff !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .print-target,
+  .print-target * {
+    visibility: visible !important;
+  }
+
+  .print-target {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: none !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    padding: 0.3in !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  header {
+    position: static !important;
+    box-shadow: none !important;
+  }
+
+  main,
+  section,
+  div {
+    box-shadow: none !important;
+  }
+
+  .print-target .no-print,
+  .print-target .no-print * {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  .print-page-break {
+    break-before: page;
+  }
+}
