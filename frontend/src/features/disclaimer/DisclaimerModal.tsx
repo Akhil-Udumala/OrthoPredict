@@ -18,7 +18,7 @@ export function DisclaimerModal({ open, onAccept }: DisclaimerModalProps) {
     <Dialog open={open}>
       <DialogContent hideClose className="max-w-2xl">
         <DialogHeader>
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-700 dark:text-amber-300">
             <AlertTriangle className="h-6 w-6" />
           </div>
           <DialogTitle>Advisory-only clinical estimate</DialogTitle>
@@ -38,7 +38,7 @@ export function DisclaimerModal({ open, onAccept }: DisclaimerModalProps) {
           </div>
           <p className="text-sm leading-6 text-muted-foreground">
             This notice is shown once per browser session and stored only in
-            <code className="mx-1 rounded bg-white px-1.5 py-0.5 text-xs">sessionStorage</code>.
+            <code className="mx-1 rounded bg-background px-1.5 py-0.5 text-xs">sessionStorage</code>.
           </p>
         </div>
 
@@ -51,4 +51,3 @@ export function DisclaimerModal({ open, onAccept }: DisclaimerModalProps) {
     </Dialog>
   );
 }
-

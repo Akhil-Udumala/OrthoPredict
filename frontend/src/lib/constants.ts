@@ -62,17 +62,17 @@ export const categoryCopy: Record<
 > = {
   short: {
     label: "Short healing outlook",
-    accent: "bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-500/25",
+    accent: "bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-500/25 dark:text-emerald-300",
     description: "The current inputs suggest a faster recovery window than average.",
   },
   medium: {
     label: "Medium healing outlook",
-    accent: "bg-sky-500/15 text-sky-700 ring-1 ring-sky-500/25",
+    accent: "bg-sky-500/15 text-sky-700 ring-1 ring-sky-500/25 dark:text-sky-300",
     description: "The current inputs suggest a moderate recovery window with balanced risk.",
   },
   long: {
     label: "Long healing outlook",
-    accent: "bg-amber-500/15 text-amber-800 ring-1 ring-amber-500/25",
+    accent: "bg-amber-500/15 text-amber-800 ring-1 ring-amber-500/25 dark:text-amber-300",
     description: "The current inputs suggest a slower recovery window and higher caution.",
   },
 };

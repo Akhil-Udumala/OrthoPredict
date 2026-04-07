@@ -7,7 +7,7 @@ interface TopFeaturesListProps {
 
 export function TopFeaturesList({ features }: TopFeaturesListProps) {
   return (
-    <div className="rounded-[1.75rem] border border-border/70 bg-white/85 p-4">
+    <div className="rounded-[1.75rem] border border-border/70 bg-card/85 p-4">
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-foreground">Key factors</h3>
         <p className="text-xs leading-5 text-muted-foreground">
@@ -24,7 +24,7 @@ export function TopFeaturesList({ features }: TopFeaturesListProps) {
               <span className="font-medium text-foreground">{getFeatureLabel(feature.feature)}</span>
               <span className="text-sm text-primary">{formatPercent(feature.importance)}</span>
             </div>
-            <div className="mt-3 h-2 rounded-full bg-white">
+            <div className="mt-3 h-2 rounded-full bg-background">
               <div
                 className="h-2 rounded-full bg-primary"
                 style={{ width: `${Math.max(feature.importance * 100, 8)}%` }}
@@ -36,4 +36,3 @@ export function TopFeaturesList({ features }: TopFeaturesListProps) {
     </div>
   );
 }
-

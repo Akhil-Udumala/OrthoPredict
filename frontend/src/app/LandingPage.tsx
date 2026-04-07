@@ -3,19 +3,19 @@ import { HeroSection } from "@/components/ui/hero-section-5";
 
 export function LandingPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[#061115] text-slate-50">
       <HeroSection />
 
-      <section id="features" className="border-t border-border/70 bg-white/70 py-20">
+      <section id="features" className="border-t border-teal-100/10 bg-[#061115] py-20">
         <div className="container">
           <div className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">
               Project overview
             </p>
             <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
               A guided recovery estimate for fracture care conversations.
             </h2>
-            <p className="mt-5 text-base leading-8 text-muted-foreground">
+            <p className="mt-5 text-base leading-8 text-slate-300">
               OrthoPredict turns familiar patient answers into the model fields it needs:
               BMI from height and weight, nutrition score from eating and hydration habits,
               and rehab adherence from therapy activity.
@@ -42,10 +42,10 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="how-it-works" className="py-20">
+      <section id="how-it-works" className="bg-[#08161b] py-20">
         <div className="container grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">
               Workflow
             </p>
             <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -72,7 +72,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="model" className="bg-slate-950 py-20 text-white">
+      <section id="model" className="bg-[#030b0e] py-20 text-white">
         <div className="container grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-200">
@@ -96,10 +96,10 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="about" className="bg-white/70 py-16">
+      <section id="about" className="bg-[#061115] py-16">
         <div className="container flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">
               Ready to try it
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight">Open the prediction app.</h2>
@@ -124,12 +124,12 @@ interface FeatureBlockProps {
 
 function FeatureBlock({ icon, title, text }: FeatureBlockProps) {
   return (
-    <div className="rounded-[2rem] border border-border/70 bg-white/80 p-6 shadow-soft">
-      <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+    <div className="rounded-[2rem] border border-teal-100/10 bg-[#0b1c22] p-6 shadow-[0_24px_70px_-40px_rgba(0,0,0,0.85)]">
+      <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-300/10 text-teal-300">
         {icon}
       </div>
       <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="mt-3 text-sm leading-7 text-muted-foreground">{text}</p>
+      <p className="mt-3 text-sm leading-7 text-slate-300">{text}</p>
     </div>
   );
 }
@@ -142,11 +142,11 @@ interface WorkflowRowProps {
 
 function WorkflowRow({ number, title, text }: WorkflowRowProps) {
   return (
-    <div className="grid gap-4 border-t border-border/80 py-6 sm:grid-cols-[4rem_1fr]">
-      <span className="text-sm font-semibold text-primary">{number}</span>
+    <div className="grid gap-4 border-t border-teal-100/10 py-6 sm:grid-cols-[4rem_1fr]">
+      <span className="text-sm font-semibold text-teal-300">{number}</span>
       <div>
         <h3 className="text-xl font-semibold">{title}</h3>
-        <p className="mt-2 text-sm leading-7 text-muted-foreground">{text}</p>
+        <p className="mt-2 text-sm leading-7 text-slate-300">{text}</p>
       </div>
     </div>
   );
@@ -154,7 +154,7 @@ function WorkflowRow({ number, title, text }: WorkflowRowProps) {
 
 function ModelPoint({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+    <div className="rounded-[1.5rem] border border-teal-100/10 bg-[#0b1c22] p-5">
       <div className="mb-4 text-teal-200">{icon}</div>
       <p className="text-sm leading-6 text-slate-200">{text}</p>
     </div>

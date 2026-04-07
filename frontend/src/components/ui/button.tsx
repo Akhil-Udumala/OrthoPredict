@@ -13,7 +13,7 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/85",
         outline:
-          "border border-border bg-white/80 text-foreground hover:bg-white",
+          "border border-border bg-card/80 text-foreground hover:bg-card",
         ghost: "text-foreground hover:bg-secondary",
       },
       size: {
@@ -51,4 +51,3 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button";
 
 export { Button, buttonVariants };
-

@@ -32,10 +32,10 @@ export function ResultCard({ result, submittedInput, onEditInputs }: ResultCardP
       initial={{ opacity: 0, y: 28 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: "easeOut" }}
-      className="print-target rounded-[2rem] border border-white/70 bg-white/80 p-5 shadow-soft backdrop-blur sm:p-7"
+      className="print-target rounded-[2rem] border border-border/70 bg-card/80 p-5 shadow-soft backdrop-blur sm:p-7"
       aria-labelledby="prediction-result-title"
     >
-      <div className="flex flex-col gap-5 border-b border-slate-200/80 pb-6 lg:flex-row lg:items-end lg:justify-between">
+      <div className="flex flex-col gap-5 border-b border-border/70 pb-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-4">
           <Badge className={categoryMeta.accent}>{getCategoryLabel(result.category)}</Badge>
           <div className="space-y-2">
@@ -70,7 +70,7 @@ export function ResultCard({ result, submittedInput, onEditInputs }: ResultCardP
 
       <div className="mt-6 grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-5">
-          <div className="rounded-[1.75rem] border border-border/70 bg-white/85 p-4">
+          <div className="rounded-[1.75rem] border border-border/70 bg-card/85 p-4">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <h3 className="text-sm font-semibold text-foreground">Submitted patient summary</h3>

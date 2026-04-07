@@ -63,10 +63,22 @@ export function ProbabilityChart({ probabilities }: ProbabilityChartProps) {
               },
             },
             scales: {
+              x: {
+                ticks: {
+                  color: "rgb(100, 116, 139)",
+                },
+                grid: {
+                  color: "rgba(148, 163, 184, 0.16)",
+                },
+              },
               y: {
                 beginAtZero: true,
                 max: 100,
+                grid: {
+                  color: "rgba(148, 163, 184, 0.16)",
+                },
                 ticks: {
+                  color: "rgb(100, 116, 139)",
                   callback(value) {
                     return `${value}%`;
                   },
@@ -84,4 +96,3 @@ export function ProbabilityChart({ probabilities }: ProbabilityChartProps) {
     </div>
   );
 }
-

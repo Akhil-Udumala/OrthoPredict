@@ -13,34 +13,34 @@ const config: Config = {
     },
     extend: {
       colors: {
-        border: "hsl(189 16% 83%)",
-        input: "hsl(185 22% 96%)",
-        ring: "hsl(185 74% 33%)",
-        background: "hsl(180 18% 97%)",
-        foreground: "hsl(197 33% 12%)",
+        border: "hsl(var(--border) / <alpha-value>)",
+        input: "hsl(var(--input) / <alpha-value>)",
+        ring: "hsl(var(--ring) / <alpha-value>)",
+        background: "hsl(var(--background) / <alpha-value>)",
+        foreground: "hsl(var(--foreground) / <alpha-value>)",
         primary: {
-          DEFAULT: "hsl(187 71% 31%)",
-          foreground: "hsl(180 20% 98%)",
+          DEFAULT: "hsl(var(--primary) / <alpha-value>)",
+          foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
         },
         secondary: {
-          DEFAULT: "hsl(188 24% 92%)",
-          foreground: "hsl(197 33% 15%)",
+          DEFAULT: "hsl(var(--secondary) / <alpha-value>)",
+          foreground: "hsl(var(--secondary-foreground) / <alpha-value>)",
         },
         muted: {
-          DEFAULT: "hsl(184 22% 93%)",
-          foreground: "hsl(199 18% 40%)",
+          DEFAULT: "hsl(var(--muted) / <alpha-value>)",
+          foreground: "hsl(var(--muted-foreground) / <alpha-value>)",
         },
         accent: {
-          DEFAULT: "hsl(164 59% 43%)",
-          foreground: "hsl(180 20% 98%)",
+          DEFAULT: "hsl(var(--accent) / <alpha-value>)",
+          foreground: "hsl(var(--accent-foreground) / <alpha-value>)",
         },
         destructive: {
-          DEFAULT: "hsl(6 76% 50%)",
-          foreground: "hsl(0 0% 98%)",
+          DEFAULT: "hsl(var(--destructive) / <alpha-value>)",
+          foreground: "hsl(var(--destructive-foreground) / <alpha-value>)",
         },
         card: {
-          DEFAULT: "hsl(0 0% 100% / 0.88)",
-          foreground: "hsl(197 33% 12%)",
+          DEFAULT: "hsl(var(--card) / <alpha-value>)",
+          foreground: "hsl(var(--card-foreground) / <alpha-value>)",
         },
       },
       borderRadius: {
@@ -49,14 +49,13 @@ const config: Config = {
         sm: "0.5rem",
       },
       boxShadow: {
-        soft: "0 24px 60px -28px rgba(15, 56, 66, 0.28)",
+        soft: "var(--shadow-soft)",
       },
       fontFamily: {
         sans: ["\"Plus Jakarta Sans\"", "system-ui", "sans-serif"],
       },
       backgroundImage: {
-        "mesh-glow":
-          "radial-gradient(circle at 20% 20%, rgba(93, 221, 195, 0.18), transparent 28%), radial-gradient(circle at 80% 0%, rgba(56, 189, 248, 0.14), transparent 26%), linear-gradient(180deg, rgba(255,255,255,0.7), rgba(237, 246, 246, 0.9))",
+        "mesh-glow": "var(--mesh-glow)",
       },
     },
   },

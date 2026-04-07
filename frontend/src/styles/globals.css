@@ -3,6 +3,58 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: light;
+    --background: 180 18% 97%;
+    --foreground: 197 33% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 197 33% 12%;
+    --border: 189 16% 83%;
+    --input: 185 22% 96%;
+    --ring: 185 74% 33%;
+    --primary: 187 71% 31%;
+    --primary-foreground: 180 20% 98%;
+    --secondary: 188 24% 92%;
+    --secondary-foreground: 197 33% 15%;
+    --muted: 184 22% 93%;
+    --muted-foreground: 199 18% 40%;
+    --accent: 164 59% 43%;
+    --accent-foreground: 180 20% 98%;
+    --destructive: 6 76% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --shadow-soft: 0 24px 60px -28px rgba(15, 56, 66, 0.28);
+    --mesh-glow:
+      radial-gradient(circle at 20% 20%, rgba(93, 221, 195, 0.18), transparent 28%),
+      radial-gradient(circle at 80% 0%, rgba(56, 189, 248, 0.14), transparent 26%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(237, 246, 246, 0.9));
+  }
+
+  .dark {
+    color-scheme: dark;
+    --background: 196 56% 5%;
+    --foreground: 180 20% 96%;
+    --card: 196 51% 9%;
+    --card-foreground: 180 20% 96%;
+    --border: 188 34% 18%;
+    --input: 196 42% 11%;
+    --ring: 177 66% 48%;
+    --primary: 181 68% 41%;
+    --primary-foreground: 190 35% 7%;
+    --secondary: 197 54% 7%;
+    --secondary-foreground: 180 22% 93%;
+    --muted: 196 42% 11%;
+    --muted-foreground: 214 18% 72%;
+    --accent: 164 64% 46%;
+    --accent-foreground: 190 35% 7%;
+    --destructive: 4 72% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --shadow-soft: 0 28px 70px -32px rgba(0, 0, 0, 0.68);
+    --mesh-glow:
+      radial-gradient(circle at 18% 16%, rgba(45, 212, 191, 0.16), transparent 28%),
+      radial-gradient(circle at 78% 0%, rgba(14, 165, 233, 0.1), transparent 30%),
+      linear-gradient(180deg, rgba(6, 17, 21, 1), rgba(8, 22, 27, 0.98));
+  }
+
   * {
     @apply border-border;
   }
@@ -12,7 +64,7 @@
   }
 
   body {
-    @apply min-h-screen bg-background font-sans text-foreground antialiased;
+    @apply min-h-screen bg-background font-sans text-foreground antialiased transition-colors duration-300;
   }
 
   #root {
@@ -29,4 +81,3 @@
     text-wrap: balance;
   }
 }
-

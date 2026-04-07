@@ -91,10 +91,10 @@ export function PredictionForm({
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={motionTransition}
-      className="no-print rounded-[2rem] border border-white/70 bg-white/75 p-5 shadow-soft backdrop-blur sm:p-7"
+      className="no-print rounded-[2rem] border border-border/70 bg-card/75 p-5 shadow-soft backdrop-blur sm:p-7"
       aria-labelledby="prediction-form-title"
     >
-      <div className="flex flex-col gap-4 border-b border-slate-200/80 pb-6">
+      <div className="flex flex-col gap-4 border-b border-border/70 pb-6">
         <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
           <Stethoscope className="h-6 w-6" />
         </div>
@@ -488,7 +488,7 @@ interface DerivedMetricProps {
 
 function DerivedMetric({ label, value }: DerivedMetricProps) {
   return (
-    <div className="rounded-2xl bg-white/75 px-4 py-3">
+    <div className="rounded-2xl bg-card/75 px-4 py-3">
       <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">{label}</p>
       <p className="mt-1 text-lg font-semibold text-primary">{value}</p>
     </div>
@@ -504,7 +504,7 @@ interface BooleanFieldProps {
 
 function BooleanField({ label, helper, checked, onCheckedChange }: BooleanFieldProps) {
   return (
-    <div className="space-y-3 rounded-[1.5rem] border border-border/70 bg-white/75 p-4">
+    <div className="space-y-3 rounded-[1.5rem] border border-border/70 bg-card/75 p-4">
       <div className="flex items-center justify-between gap-4">
         <div className="space-y-1">
           <Label>{label}</Label>

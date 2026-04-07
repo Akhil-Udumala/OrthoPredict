@@ -89,7 +89,7 @@ export function WhatIfSimulator({
   }
 
   return (
-    <section className="rounded-[2rem] border border-white/70 bg-white/75 p-5 shadow-soft backdrop-blur sm:p-7">
+    <section className="rounded-[2rem] border border-border/70 bg-card/75 p-5 shadow-soft backdrop-blur sm:p-7">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
@@ -171,7 +171,7 @@ export function WhatIfSimulator({
                   />
                 </div>
 
-                <div className="grid gap-3 rounded-[1.5rem] bg-white/85 p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-center">
+                <div className="grid gap-3 rounded-[1.5rem] bg-card/85 p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-center">
                   <p className="text-sm text-foreground">
                     Nutrition score: <strong>{nutritionScore}/10</strong>
                   </p>
@@ -198,7 +198,7 @@ export function WhatIfSimulator({
                 ) : null}
               </div>
 
-              <div className="rounded-[1.75rem] border border-border/70 bg-white/85 p-5">
+              <div className="rounded-[1.75rem] border border-border/70 bg-card/85 p-5">
                 <h3 className="text-sm font-semibold text-foreground">Comparison summary</h3>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{comparisonCopy}</p>
 
@@ -284,7 +284,7 @@ function SimulatorNumberField({
   onChange,
 }: SimulatorNumberFieldProps) {
   return (
-    <div className="space-y-2 rounded-[1.5rem] bg-white/85 p-4">
+    <div className="space-y-2 rounded-[1.5rem] bg-card/85 p-4">
       <Label>{label}</Label>
       <Input
         type="number"
@@ -318,7 +318,7 @@ function SimulatorBooleanField({
   onCheckedChange,
 }: SimulatorBooleanFieldProps) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-[1.5rem] bg-white/85 p-4">
+    <div className="flex items-center justify-between gap-4 rounded-[1.5rem] bg-card/85 p-4">
       <div className="space-y-2">
         <Label>{label}</Label>
         <p className="text-xs text-muted-foreground">{checked ? "Yes" : "No"}</p>

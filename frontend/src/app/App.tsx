@@ -9,6 +9,7 @@ import { ResultCard } from "@/features/prediction-result/ResultCard";
 import { WhatIfSimulator } from "@/features/what-if-simulator/WhatIfSimulator";
 import { FrontendError } from "@/lib/api/errors";
 import { predictHealingTime } from "@/lib/api/predict";
+import { cn } from "@/lib/utils";
 import {
   getPredictionSession,
   hasSeenDisclaimer,
@@ -57,6 +58,11 @@ export function App() {
       window.removeEventListener("popstate", syncRoute);
     };
   }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.remove("dark");
+    document.documentElement.style.colorScheme = route === "landing" ? "dark" : "light";
+  }, [route]);
 
   useEffect(() => {
     function setFrontendAssetError(url?: string | null) {
@@ -173,29 +179,36 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen bg-mesh-glow text-foreground">
+    <div
+      className={cn(
+        "min-h-screen text-foreground",
+        route === "landing" ? "bg-[#061115]" : "bg-mesh-glow",
+      )}
+    >
       {route === "landing" ? <LandingPage /> : null}
 
       {route !== "landing" ? (
         <>
           <DisclaimerModal open={!disclaimerAccepted} onAccept={acceptDisclaimer} />
 
-          <header className="sticky top-0 z-30 border-b border-white/60 bg-white/75 backdrop-blur">
+          <header className="sticky top-0 z-30 border-b border-border/70 bg-card/75 backdrop-blur">
             <div className="container py-4">
-              <div>
-                <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary">
-                  OrthoPredict
-                </p>
-                <h1 className="text-lg font-bold text-foreground">
-                  Bone fracture healing time prediction
-                </h1>
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary">
+                    OrthoPredict
+                  </p>
+                  <h1 className="text-lg font-bold text-foreground">
+                    Bone fracture healing time prediction
+                  </h1>
+                </div>
               </div>
             </div>
           </header>
 
           <main className="container pb-12 pt-8 sm:pb-16 sm:pt-10">
             {assetError ? (
-              <section className="mb-6 rounded-[1.5rem] border border-amber-500/20 bg-amber-500/10 px-5 py-4 text-sm leading-6 text-amber-900">
+              <section className="mb-6 rounded-[1.5rem] border border-amber-500/25 bg-amber-500/10 px-5 py-4 text-sm leading-6 text-amber-800 dark:text-amber-200">
                 {assetError}
               </section>
             ) : null}
@@ -265,7 +278,7 @@ function FormPage({
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: "easeOut" }}
-          className="overflow-hidden rounded-[2rem] border border-white/70 bg-slate-950 p-6 text-white shadow-soft sm:p-8"
+          className="overflow-hidden rounded-[2rem] border border-border/70 bg-slate-950 p-6 text-white shadow-soft sm:p-8 dark:bg-card"
         >
           <div className="flex h-full flex-col justify-between gap-8">
             <div className="space-y-4">
@@ -301,7 +314,7 @@ function FormPage({
           </div>
         </motion.div>
 
-        <div className="rounded-[2rem] border border-white/70 bg-white/55 p-6 shadow-soft backdrop-blur sm:p-8">
+        <div className="rounded-[2rem] border border-border/70 bg-card/70 p-6 shadow-soft backdrop-blur sm:p-8">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
             Beginner-friendly workflow
           </p>
@@ -368,7 +381,7 @@ function ResultsPage({
 }: ResultsPageProps) {
   if (!prediction || !submittedInput) {
     return (
-      <section className="rounded-[2rem] border border-dashed border-primary/25 bg-white/65 p-6 text-sm leading-6 text-muted-foreground shadow-soft backdrop-blur">
+      <section className="rounded-[2rem] border border-dashed border-primary/25 bg-card/70 p-6 text-sm leading-6 text-muted-foreground shadow-soft backdrop-blur">
         <h2 className="text-2xl font-bold text-foreground">No prediction yet</h2>
         <p className="mt-2 max-w-2xl">
           Submit the patient profile first to open the personalized week estimate,

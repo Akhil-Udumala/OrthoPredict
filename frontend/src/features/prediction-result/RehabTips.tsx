@@ -4,7 +4,7 @@ interface RehabTipsProps {
 
 export function RehabTips({ tips }: RehabTipsProps) {
   return (
-    <div className="rounded-[1.75rem] border border-border/70 bg-white/85 p-4">
+    <div className="rounded-[1.75rem] border border-border/70 bg-card/85 p-4">
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-foreground">Rehab tips</h3>
         <p className="text-xs leading-5 text-muted-foreground">
@@ -24,4 +24,3 @@ export function RehabTips({ tips }: RehabTipsProps) {
     </div>
   );
 }
-

@@ -7,7 +7,7 @@ interface DriverSignalsListProps {
 
 export function DriverSignalsList({ signals }: DriverSignalsListProps) {
   return (
-    <div className="rounded-[1.75rem] border border-border/70 bg-white/85 p-4">
+    <div className="rounded-[1.75rem] border border-border/70 bg-card/85 p-4">
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-foreground">Driver signals</h3>
         <p className="text-xs leading-5 text-muted-foreground">
@@ -25,8 +25,8 @@ export function DriverSignalsList({ signals }: DriverSignalsListProps) {
               <span
                 className={`rounded-full px-3 py-1 text-xs font-semibold ${
                   signal.direction === "lower"
-                    ? "bg-emerald-500/15 text-emerald-700"
-                    : "bg-amber-500/15 text-amber-800"
+                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                    : "bg-amber-500/15 text-amber-800 dark:text-amber-300"
                 }`}
               >
                 {describeDriverSignal(signal)}
@@ -38,4 +38,3 @@ export function DriverSignalsList({ signals }: DriverSignalsListProps) {
     </div>
   );
 }
-
