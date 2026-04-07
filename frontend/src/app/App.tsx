@@ -1,18 +1,30 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { ActivitySquare, HeartPulse, ShieldPlus } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ActivitySquare, ArrowLeft, HeartPulse, ShieldPlus } from "lucide-react";
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { LandingPage } from "@/app/LandingPage";
 import { DisclaimerModal } from "@/features/disclaimer/DisclaimerModal";
 import { PredictionForm } from "@/features/prediction-form/PredictionForm";
 import { ResultCard } from "@/features/prediction-result/ResultCard";
 import { WhatIfSimulator } from "@/features/what-if-simulator/WhatIfSimulator";
 import { FrontendError } from "@/lib/api/errors";
 import { predictHealingTime } from "@/lib/api/predict";
-import { hasSeenDisclaimer, setDisclaimerSeen } from "@/lib/storage";
+import {
+  getPredictionSession,
+  hasSeenDisclaimer,
+  setDisclaimerSeen,
+  setPredictionSession,
+} from "@/lib/storage";
 import type { PatientInput, PredictionResponse } from "@/types/api";
+import type { PatientIntakeFormValues } from "@/types/form";
+
+type AppRoute = "landing" | "form" | "results";
 
 export function App() {
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
+  const [route, setRoute] = useState<AppRoute>(() => getRouteFromLocation());
   const [submittedInput, setSubmittedInput] = useState<PatientInput | null>(null);
+  const [submittedIntake, setSubmittedIntake] = useState<PatientIntakeFormValues | null>(null);
   const [prediction, setPrediction] = useState<PredictionResponse | null>(null);
   const [simulation, setSimulation] = useState<PredictionResponse | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,6 +36,26 @@ export function App() {
 
   useEffect(() => {
     setDisclaimerAccepted(hasSeenDisclaimer());
+
+    const storedSession = getPredictionSession();
+
+    if (storedSession) {
+      setSubmittedInput(storedSession.input);
+      setSubmittedIntake(storedSession.intake);
+      setPrediction(storedSession.prediction);
+    }
+  }, []);
+
+  useEffect(() => {
+    function syncRoute() {
+      setRoute(getRouteFromLocation());
+    }
+
+    window.addEventListener("popstate", syncRoute);
+
+    return () => {
+      window.removeEventListener("popstate", syncRoute);
+    };
   }, []);
 
   useEffect(() => {
@@ -71,16 +103,22 @@ export function App() {
     };
   }, []);
 
-  async function handlePredictionRequest(payload: PatientInput) {
+  async function handlePredictionRequest(
+    payload: PatientInput,
+    intakeValues: PatientIntakeFormValues,
+  ) {
     setIsSubmitting(true);
     setApiError(null);
 
     try {
       const result = await predictHealingTime(payload);
       setSubmittedInput(payload);
+      setSubmittedIntake(intakeValues);
       setPrediction(result);
+      setPredictionSession(payload, result, intakeValues);
       setSimulation(null);
       setSimulationError(null);
+      navigateTo("results");
     } catch (error) {
       setApiError(getReadableErrorMessage(error));
     } finally {
@@ -114,144 +152,259 @@ export function App() {
     }
   }
 
-  const activeResult = useMemo(() => prediction, [prediction]);
-
   function acceptDisclaimer() {
     setDisclaimerSeen();
     setDisclaimerAccepted(true);
   }
 
-  function scrollToForm() {
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  function navigateTo(nextRoute: AppRoute) {
+    const nextPath =
+      nextRoute === "results" ? "/results" : nextRoute === "form" ? "/predict" : "/";
+
+    if (window.location.pathname !== nextPath) {
+      window.history.pushState({}, "", nextPath);
+    }
+
+    setRoute(nextRoute);
+
+    if (nextRoute === "form") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }
 
   return (
     <div className="min-h-screen bg-mesh-glow text-foreground">
-      <DisclaimerModal open={!disclaimerAccepted} onAccept={acceptDisclaimer} />
+      {route === "landing" ? <LandingPage /> : null}
 
-      <header className="sticky top-0 z-30 border-b border-white/60 bg-white/75 backdrop-blur">
-        <div className="container py-4">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary">
-              OrthoPredict
-            </p>
-            <h1 className="text-lg font-bold text-foreground">
-              Bone fracture healing time prediction
-            </h1>
-          </div>
-        </div>
-      </header>
+      {route !== "landing" ? (
+        <>
+          <DisclaimerModal open={!disclaimerAccepted} onAccept={acceptDisclaimer} />
 
-      <main className="container pb-12 pt-8 sm:pb-16 sm:pt-10">
-        {assetError ? (
-          <section className="mb-6 rounded-[1.5rem] border border-amber-500/20 bg-amber-500/10 px-5 py-4 text-sm leading-6 text-amber-900">
-            {assetError}
-          </section>
-        ) : null}
-
-        <section className="grid gap-6 lg:grid-cols-[1.12fr_0.88fr] lg:items-stretch">
-          <motion.div
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
-            className="overflow-hidden rounded-[2rem] border border-white/70 bg-slate-950 p-6 text-white shadow-soft sm:p-8"
-          >
-            <div className="flex h-full flex-col justify-between gap-8">
-              <div className="space-y-4">
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-200">
-                  Healing Outlook Workspace
+          <header className="sticky top-0 z-30 border-b border-white/60 bg-white/75 backdrop-blur">
+            <div className="container py-4">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary">
+                  OrthoPredict
                 </p>
-                <h2 className="max-w-xl text-4xl font-bold leading-tight sm:text-[3.25rem]">
-                  Structured intake on the left. Recovery estimate below.
-                </h2>
-                <p className="max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
-                  The interface stays clinical, quiet, and readable: enter the exact contract
-                  fields, submit once, then review the healing category, confidence, and key
-                  recovery factors without leaving the page.
-                </p>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-3">
-                <InsightTile
-                  icon={<HeartPulse className="h-5 w-5" />}
-                  title="Evidence-aware"
-                  text="Inline validation mirrors the backend ranges before any request is sent."
-                />
-                <InsightTile
-                  icon={<ShieldPlus className="h-5 w-5" />}
-                  title="Advisory-first"
-                  text="A session disclaimer blocks interaction until it is acknowledged."
-                />
-                <InsightTile
-                  icon={<ActivitySquare className="h-5 w-5" />}
-                  title="What-if ready"
-                  text="Two post-result sliders explore modifiable care factors."
-                />
+                <h1 className="text-lg font-bold text-foreground">
+                  Bone fracture healing time prediction
+                </h1>
               </div>
             </div>
-          </motion.div>
+          </header>
 
-          <div className="rounded-[2rem] border border-white/70 bg-white/55 p-6 shadow-soft backdrop-blur sm:p-8">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
-              Beginner-friendly workflow
-            </p>
-            <div className="mt-5 space-y-5">
-              <WorkflowStep
-                number="01"
-                title="Review the advisory notice"
-                text="The modal explains that this tool supports decisions but does not replace a clinician."
-              />
-              <WorkflowStep
-                number="02"
-                title="Enter the nine required fields"
-                text="Every value uses the backend’s exact snake_case contract and allowed ranges."
-              />
-              <WorkflowStep
-                number="03"
-                title="Submit and review the result"
-                text="The result stays on the same page with confidence, probabilities, top features, and rehab tips."
-              />
-              <WorkflowStep
-                number="04"
-                title="Try the what-if simulator"
-                text="Only nutrition_score and rehab_adherence change, so the comparison stays easy to understand."
-              />
-            </div>
-          </div>
-        </section>
+          <main className="container pb-12 pt-8 sm:pb-16 sm:pt-10">
+            {assetError ? (
+              <section className="mb-6 rounded-[1.5rem] border border-amber-500/20 bg-amber-500/10 px-5 py-4 text-sm leading-6 text-amber-900">
+                {assetError}
+              </section>
+            ) : null}
 
-        <div className="mt-8 grid gap-8">
-          <PredictionForm
-            onSubmit={handlePredictionRequest}
-            isSubmitting={isSubmitting}
-            apiError={apiError}
-            formRef={formRef}
-          />
-
-          {activeResult && submittedInput ? (
-            <>
-              <ResultCard
-                result={activeResult}
+            {route === "form" ? (
+              <FormPage
+                apiError={apiError}
+                formRef={formRef}
+                initialValues={submittedIntake}
+                isSubmitting={isSubmitting}
+                onSubmit={handlePredictionRequest}
+              />
+            ) : (
+              <ResultsPage
+                prediction={prediction}
+                simulation={simulation}
+                simulationError={simulationError}
+                submittedIntake={submittedIntake}
                 submittedInput={submittedInput}
-                onEditInputs={scrollToForm}
-              />
-              <WhatIfSimulator
-                baseInput={submittedInput}
-                baseResult={activeResult}
-                simulatedResult={simulation}
                 isSimulating={isSimulating}
-                error={simulationError}
+                onBackToForm={() => navigateTo("form")}
                 onSimulate={handleSimulationRequest}
               />
-            </>
-          ) : (
-            <section className="rounded-[2rem] border border-dashed border-primary/25 bg-white/45 p-6 text-sm leading-6 text-muted-foreground">
-              Submit the form to see the personalized week estimate, confidence, probability
-              chart, top features, driver signals, rehab tips, and print-ready patient summary.
-            </section>
-          )}
+            )}
+          </main>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+function getRouteFromLocation(): AppRoute {
+  if (typeof window === "undefined") {
+    return "landing";
+  }
+
+  if (window.location.pathname.endsWith("/results")) {
+    return "results";
+  }
+
+  if (window.location.pathname.endsWith("/predict")) {
+    return "form";
+  }
+
+  return "landing";
+}
+
+interface FormPageProps {
+  apiError: string | null;
+  formRef: React.RefObject<HTMLDivElement>;
+  initialValues: PatientIntakeFormValues | null;
+  isSubmitting: boolean;
+  onSubmit: (payload: PatientInput, intakeValues: PatientIntakeFormValues) => Promise<void>;
+}
+
+function FormPage({
+  apiError,
+  formRef,
+  initialValues,
+  isSubmitting,
+  onSubmit,
+}: FormPageProps) {
+  return (
+    <>
+      <section className="grid gap-6 lg:grid-cols-[1.12fr_0.88fr] lg:items-stretch">
+        <motion.div
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="overflow-hidden rounded-[2rem] border border-white/70 bg-slate-950 p-6 text-white shadow-soft sm:p-8"
+        >
+          <div className="flex h-full flex-col justify-between gap-8">
+            <div className="space-y-4">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-200">
+                Healing Outlook Intake
+              </p>
+              <h2 className="max-w-xl text-4xl font-bold leading-tight sm:text-[3.25rem]">
+                Start with a focused patient profile.
+              </h2>
+              <p className="max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
+                Enter measurements and care habits, submit once, then continue to a dedicated
+                results page for the healing estimate and simulator.
+              </p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <InsightTile
+                icon={<HeartPulse className="h-5 w-5" />}
+                title="Evidence-aware"
+                text="Inline validation mirrors the backend ranges before any request is sent."
+              />
+              <InsightTile
+                icon={<ShieldPlus className="h-5 w-5" />}
+                title="Advisory-first"
+                text="A session disclaimer blocks interaction until it is acknowledged."
+              />
+              <InsightTile
+                icon={<ActivitySquare className="h-5 w-5" />}
+                title="Results page"
+                text="Predictions and the what-if simulator open after submission."
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="rounded-[2rem] border border-white/70 bg-white/55 p-6 shadow-soft backdrop-blur sm:p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
+            Beginner-friendly workflow
+          </p>
+          <div className="mt-5 space-y-5">
+            <WorkflowStep
+              number="01"
+              title="Review the advisory notice"
+              text="The modal explains that this tool supports decisions but does not replace a clinician."
+            />
+            <WorkflowStep
+              number="02"
+              title="Enter measurements and habits"
+              text="Height, weight, meals, hydration, and rehab activity are used to calculate the model fields."
+            />
+            <WorkflowStep
+              number="03"
+              title="Open the prediction page"
+              text="The submit button routes to the result view after the backend returns an estimate."
+            />
+            <WorkflowStep
+              number="04"
+              title="Try the what-if simulator"
+              text="Change nutrition and rehab habits while every other patient field stays fixed."
+            />
+          </div>
         </div>
-      </main>
+      </section>
+
+      <div className="mt-8">
+        <PredictionForm
+          onSubmit={onSubmit}
+          isSubmitting={isSubmitting}
+          apiError={apiError}
+          formRef={formRef}
+          initialValues={initialValues}
+        />
+      </div>
+    </>
+  );
+}
+
+interface ResultsPageProps {
+  prediction: PredictionResponse | null;
+  simulation: PredictionResponse | null;
+  simulationError: string | null;
+  submittedIntake: PatientIntakeFormValues | null;
+  submittedInput: PatientInput | null;
+  isSimulating: boolean;
+  onBackToForm: () => void;
+  onSimulate: (
+    overrides: Pick<PatientInput, "nutrition_score" | "rehab_adherence">,
+  ) => Promise<void>;
+}
+
+function ResultsPage({
+  prediction,
+  simulation,
+  simulationError,
+  submittedIntake,
+  submittedInput,
+  isSimulating,
+  onBackToForm,
+  onSimulate,
+}: ResultsPageProps) {
+  if (!prediction || !submittedInput) {
+    return (
+      <section className="rounded-[2rem] border border-dashed border-primary/25 bg-white/65 p-6 text-sm leading-6 text-muted-foreground shadow-soft backdrop-blur">
+        <h2 className="text-2xl font-bold text-foreground">No prediction yet</h2>
+        <p className="mt-2 max-w-2xl">
+          Submit the patient profile first to open the personalized week estimate,
+          confidence, probability chart, driver signals, rehab tips, and what-if simulator.
+        </p>
+        <Button type="button" className="mt-5" onClick={onBackToForm}>
+          <ArrowLeft className="h-4 w-4" />
+          Back to input form
+        </Button>
+      </section>
+    );
+  }
+
+  return (
+    <div className="grid gap-8">
+      <div className="no-print">
+        <Button type="button" variant="outline" onClick={onBackToForm}>
+          <ArrowLeft className="h-4 w-4" />
+          Back to input form
+        </Button>
+      </div>
+
+      <ResultCard
+        result={prediction}
+        submittedInput={submittedInput}
+        onEditInputs={onBackToForm}
+      />
+      <WhatIfSimulator
+        baseInput={submittedInput}
+        baseIntake={submittedIntake}
+        baseResult={prediction}
+        simulatedResult={simulation}
+        isSimulating={isSimulating}
+        error={simulationError}
+        onSimulate={onSimulate}
+      />
     </div>
   );
 }

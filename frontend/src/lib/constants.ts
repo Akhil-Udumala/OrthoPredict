@@ -4,6 +4,7 @@ export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL?.trim() || "http://127.0.0.1:8000";
 
 export const DISCLAIMER_STORAGE_KEY = "orthopredict.disclaimer_seen";
+export const PREDICTION_SESSION_STORAGE_KEY = "orthopredict.prediction_session";
 
 export const DEFAULT_FORM_VALUES: PatientInput = {
   age: 38,
@@ -42,9 +43,9 @@ export const featureLabels: Record<FeatureName, string> = {
   age: "Age",
   fracture_type: "Fracture Type",
   bone_affected: "Bone Affected",
-  nutrition_score: "Nutrition Score",
-  rehab_adherence: "Rehab Adherence",
-  bmi: "BMI",
+  nutrition_score: "Calculated Nutrition Score",
+  rehab_adherence: "Calculated Rehab Adherence",
+  bmi: "Calculated BMI",
   diabetes: "Diabetes",
   osteoporosis: "Osteoporosis",
   smoker: "Smoker",

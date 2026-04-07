@@ -2,12 +2,30 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { formatPercent, formatWeeks } from "@/lib/formatters";
 import type { PatientInput, PredictionResponse } from "@/types/api";
+import {
+  calculateNutritionScore,
+  calculateRehabAdherence,
+  type PatientIntakeFormValues,
+} from "@/types/form";
+
+type SimulatorInputs = Pick<
+  PatientIntakeFormValues,
+  | "balanced_meals_per_day"
+  | "protein_servings_per_day"
+  | "hydration_cups_per_day"
+  | "rehab_sessions_per_week"
+  | "home_exercise_days_per_week"
+  | "follows_weight_bearing_guidance"
+>;
 
 interface WhatIfSimulatorProps {
   baseInput: PatientInput;
+  baseIntake: PatientIntakeFormValues | null;
   baseResult: PredictionResponse;
   simulatedResult: PredictionResponse | null;
   isSimulating: boolean;
@@ -17,6 +35,7 @@ interface WhatIfSimulatorProps {
 
 export function WhatIfSimulator({
   baseInput,
+  baseIntake,
   baseResult,
   simulatedResult,
   isSimulating,
@@ -24,17 +43,20 @@ export function WhatIfSimulator({
   onSimulate,
 }: WhatIfSimulatorProps) {
   const [open, setOpen] = useState(false);
-  const [nutritionScore, setNutritionScore] = useState(baseInput.nutrition_score);
-  const [rehabAdherence, setRehabAdherence] = useState(baseInput.rehab_adherence);
+  const [simulatorInputs, setSimulatorInputs] = useState<SimulatorInputs>(() =>
+    buildSimulatorInputs(baseInput, baseIntake),
+  );
 
   useEffect(() => {
-    setNutritionScore(baseInput.nutrition_score);
-    setRehabAdherence(baseInput.rehab_adherence);
-  }, [baseInput]);
+    setSimulatorInputs(buildSimulatorInputs(baseInput, baseIntake));
+  }, [baseInput, baseIntake]);
+
+  const nutritionScore = calculateNutritionScore(simulatorInputs);
+  const rehabAdherence = calculateRehabAdherence(simulatorInputs);
 
   const comparisonCopy = useMemo(() => {
     if (!simulatedResult) {
-      return "Adjust the two sliders below to explore how supportive lifestyle inputs might shift the estimate.";
+      return "Adjust the nutrition and rehab habits below to explore how modifiable inputs might shift the estimate.";
     }
 
     const deltaWeeks = simulatedResult.predicted_weeks - baseResult.predicted_weeks;
@@ -52,11 +74,18 @@ export function WhatIfSimulator({
     return `The simulated outcome moved from ${baseResult.category} to ${simulatedResult.category}, and the estimate ${deltaLabel}.`;
   }, [baseResult, simulatedResult]);
 
-  async function runSimulation(nextNutritionScore: number, nextRehabAdherence: number) {
+  async function runSimulation() {
     await onSimulate({
-      nutrition_score: nextNutritionScore,
-      rehab_adherence: nextRehabAdherence,
+      nutrition_score: nutritionScore,
+      rehab_adherence: rehabAdherence,
     });
+  }
+
+  function updateSimulatorInput(name: keyof SimulatorInputs, value: number | boolean) {
+    setSimulatorInputs((current) => ({
+      ...current,
+      [name]: value,
+    }));
   }
 
   return (
@@ -68,18 +97,11 @@ export function WhatIfSimulator({
             What-if simulator
           </div>
           <h2 className="text-2xl font-bold text-foreground">
-            Explore two modifiable recovery factors
+            Explore modifiable recovery habits
           </h2>
           <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-            The simulator keeps every other field fixed and only resubmits
-            <code className="mx-1 rounded bg-secondary px-1.5 py-0.5 text-xs">
-              nutrition_score
-            </code>
-            and
-            <code className="mx-1 rounded bg-secondary px-1.5 py-0.5 text-xs">
-              rehab_adherence
-            </code>
-            .
+            The simulator keeps every other field fixed and calculates updated
+            nutrition and rehab scores from plain-language habit inputs.
           </p>
         </div>
 
@@ -102,25 +124,65 @@ export function WhatIfSimulator({
           >
             <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_0.9fr]">
               <div className="space-y-5 rounded-[1.75rem] border border-border/70 bg-secondary/45 p-5">
-                <SimulatorSlider
-                  label="Nutrition score"
-                  value={nutritionScore}
-                  helper="Moves from 1 to 10, matching the contract exactly."
-                  onChange={setNutritionScore}
-                  onCommit={async (value) => {
-                    await runSimulation(value, rehabAdherence);
-                  }}
-                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <SimulatorNumberField
+                    label="Balanced meals per day"
+                    min={0}
+                    max={4}
+                    value={simulatorInputs.balanced_meals_per_day}
+                    onChange={(value) => updateSimulatorInput("balanced_meals_per_day", value)}
+                  />
+                  <SimulatorNumberField
+                    label="Protein servings per day"
+                    min={0}
+                    max={5}
+                    value={simulatorInputs.protein_servings_per_day}
+                    onChange={(value) => updateSimulatorInput("protein_servings_per_day", value)}
+                  />
+                  <SimulatorNumberField
+                    label="Water cups per day"
+                    min={0}
+                    max={12}
+                    value={simulatorInputs.hydration_cups_per_day}
+                    onChange={(value) => updateSimulatorInput("hydration_cups_per_day", value)}
+                  />
+                  <SimulatorNumberField
+                    label="Rehab sessions per week"
+                    min={0}
+                    max={7}
+                    value={simulatorInputs.rehab_sessions_per_week}
+                    onChange={(value) => updateSimulatorInput("rehab_sessions_per_week", value)}
+                  />
+                  <SimulatorNumberField
+                    label="Home exercise days"
+                    min={0}
+                    max={7}
+                    value={simulatorInputs.home_exercise_days_per_week}
+                    onChange={(value) =>
+                      updateSimulatorInput("home_exercise_days_per_week", value)
+                    }
+                  />
+                  <SimulatorBooleanField
+                    label="Following movement restrictions"
+                    checked={simulatorInputs.follows_weight_bearing_guidance}
+                    onCheckedChange={(checked) =>
+                      updateSimulatorInput("follows_weight_bearing_guidance", checked)
+                    }
+                  />
+                </div>
 
-                <SimulatorSlider
-                  label="Rehab adherence"
-                  value={rehabAdherence}
-                  helper="Moves from 1 to 10 and triggers a fresh prediction on release."
-                  onChange={setRehabAdherence}
-                  onCommit={async (value) => {
-                    await runSimulation(nutritionScore, value);
-                  }}
-                />
+                <div className="grid gap-3 rounded-[1.5rem] bg-white/85 p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-center">
+                  <p className="text-sm text-foreground">
+                    Nutrition score: <strong>{nutritionScore}/10</strong>
+                  </p>
+                  <p className="text-sm text-foreground">
+                    Rehab adherence: <strong>{rehabAdherence}/10</strong>
+                  </p>
+                  <Button type="button" onClick={runSimulation} disabled={isSimulating}>
+                    {isSimulating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                    Run simulation
+                  </Button>
+                </div>
 
                 {isSimulating ? (
                   <div className="flex items-center gap-2 text-sm text-primary">
@@ -166,44 +228,102 @@ export function WhatIfSimulator({
   );
 }
 
-interface SimulatorSliderProps {
-  label: string;
-  value: number;
-  helper: string;
-  onChange: (value: number) => void;
-  onCommit: (value: number) => Promise<void>;
+function buildSimulatorInputs(
+  baseInput: PatientInput,
+  baseIntake: PatientIntakeFormValues | null,
+): SimulatorInputs {
+  if (baseIntake) {
+    return {
+      balanced_meals_per_day: baseIntake.balanced_meals_per_day,
+      protein_servings_per_day: baseIntake.protein_servings_per_day,
+      hydration_cups_per_day: baseIntake.hydration_cups_per_day,
+      rehab_sessions_per_week: baseIntake.rehab_sessions_per_week,
+      home_exercise_days_per_week: baseIntake.home_exercise_days_per_week,
+      follows_weight_bearing_guidance: baseIntake.follows_weight_bearing_guidance,
+    };
+  }
+
+  return {
+    balanced_meals_per_day: Math.min(
+      4,
+      Math.max(0, Math.round((baseInput.nutrition_score / 10) * 3)),
+    ),
+    protein_servings_per_day: Math.min(
+      5,
+      Math.max(0, Math.round((baseInput.nutrition_score / 10) * 4)),
+    ),
+    hydration_cups_per_day: Math.min(
+      12,
+      Math.max(0, Math.round((baseInput.nutrition_score / 10) * 8)),
+    ),
+    rehab_sessions_per_week: Math.min(
+      7,
+      Math.max(0, Math.round((baseInput.rehab_adherence / 10) * 7)),
+    ),
+    home_exercise_days_per_week: Math.min(
+      7,
+      Math.max(0, Math.round((baseInput.rehab_adherence / 10) * 7)),
+    ),
+    follows_weight_bearing_guidance: baseInput.rehab_adherence >= 7,
+  };
 }
 
-function SimulatorSlider({
+interface SimulatorNumberFieldProps {
+  label: string;
+  min: number;
+  max: number;
+  value: number;
+  onChange: (value: number) => void;
+}
+
+function SimulatorNumberField({
   label,
+  min,
+  max,
   value,
-  helper,
   onChange,
-  onCommit,
-}: SimulatorSliderProps) {
+}: SimulatorNumberFieldProps) {
   return (
-    <div className="space-y-4 rounded-[1.5rem] bg-white/85 p-4">
-      <div className="flex items-start justify-between gap-4">
-        <div className="space-y-1">
-          <h4 className="text-sm font-semibold text-foreground">{label}</h4>
-          <p className="text-xs leading-5 text-muted-foreground">{helper}</p>
-        </div>
-        <div className="rounded-full bg-secondary px-3 py-1 text-sm font-semibold text-primary">
-          {value}/10
-        </div>
-      </div>
-      <Slider
-        min={1}
-        max={10}
+    <div className="space-y-2 rounded-[1.5rem] bg-white/85 p-4">
+      <Label>{label}</Label>
+      <Input
+        type="number"
+        min={min}
+        max={max}
         step={1}
-        value={[value]}
-        onValueChange={(values) => onChange(values[0] ?? value)}
-        onValueCommit={async (values) => {
-          const committedValue = values[0] ?? value;
-          await onCommit(committedValue);
+        inputMode="numeric"
+        value={value}
+        onChange={(event) => {
+          const parsedValue = Number(event.currentTarget.value);
+          onChange(Math.min(max, Math.max(min, Number.isFinite(parsedValue) ? parsedValue : min)));
         }}
         aria-label={label}
       />
+      <p className="text-xs text-muted-foreground">
+        Enter a whole number from {min} to {max}.
+      </p>
+    </div>
+  );
+}
+
+interface SimulatorBooleanFieldProps {
+  label: string;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+}
+
+function SimulatorBooleanField({
+  label,
+  checked,
+  onCheckedChange,
+}: SimulatorBooleanFieldProps) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-[1.5rem] bg-white/85 p-4">
+      <div className="space-y-2">
+        <Label>{label}</Label>
+        <p className="text-xs text-muted-foreground">{checked ? "Yes" : "No"}</p>
+      </div>
+      <Switch checked={checked} onCheckedChange={onCheckedChange} aria-label={label} />
     </div>
   );
 }

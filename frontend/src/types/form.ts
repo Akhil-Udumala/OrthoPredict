@@ -5,6 +5,7 @@ import {
   fractureTypeValues,
   healingCategoryValues,
   topFeatureValues,
+  type PatientInput,
 } from "@/types/api";
 
 export const patientInputSchema = z.object({
@@ -63,6 +64,142 @@ export const patientInputSchema = z.object({
   }),
 });
 
+export const patientIntakeSchema = patientInputSchema
+  .omit({
+    bmi: true,
+    nutrition_score: true,
+    rehab_adherence: true,
+  })
+  .extend({
+    height_cm: z
+      .number({
+        required_error: "Height is required.",
+        invalid_type_error: "Height must be a number.",
+      })
+      .finite("Height must be a number.")
+      .min(100, "Height must be at least 100 cm.")
+      .max(230, "Height must be 230 cm or less."),
+    weight_kg: z
+      .number({
+        required_error: "Weight is required.",
+        invalid_type_error: "Weight must be a number.",
+      })
+      .finite("Weight must be a number.")
+      .min(20, "Weight must be at least 20 kg.")
+      .max(250, "Weight must be 250 kg or less."),
+    balanced_meals_per_day: z
+      .number({
+        required_error: "Balanced meals per day is required.",
+        invalid_type_error: "Balanced meals per day must be a number.",
+      })
+      .finite("Balanced meals per day must be a number.")
+      .int("Balanced meals per day must be a whole number.")
+      .min(0, "Balanced meals per day must be between 0 and 4.")
+      .max(4, "Balanced meals per day must be between 0 and 4."),
+    protein_servings_per_day: z
+      .number({
+        required_error: "Protein servings per day is required.",
+        invalid_type_error: "Protein servings per day must be a number.",
+      })
+      .finite("Protein servings per day must be a number.")
+      .int("Protein servings per day must be a whole number.")
+      .min(0, "Protein servings per day must be between 0 and 5.")
+      .max(5, "Protein servings per day must be between 0 and 5."),
+    hydration_cups_per_day: z
+      .number({
+        required_error: "Water intake is required.",
+        invalid_type_error: "Water intake must be a number.",
+      })
+      .finite("Water intake must be a number.")
+      .int("Water intake must be a whole number.")
+      .min(0, "Water intake must be between 0 and 12 cups.")
+      .max(12, "Water intake must be between 0 and 12 cups."),
+    rehab_sessions_per_week: z
+      .number({
+        required_error: "Rehab sessions per week is required.",
+        invalid_type_error: "Rehab sessions per week must be a number.",
+      })
+      .finite("Rehab sessions per week must be a number.")
+      .int("Rehab sessions per week must be a whole number.")
+      .min(0, "Rehab sessions per week must be between 0 and 7.")
+      .max(7, "Rehab sessions per week must be between 0 and 7."),
+    home_exercise_days_per_week: z
+      .number({
+        required_error: "Home exercise days per week is required.",
+        invalid_type_error: "Home exercise days per week must be a number.",
+      })
+      .finite("Home exercise days per week must be a number.")
+      .int("Home exercise days per week must be a whole number.")
+      .min(0, "Home exercise days per week must be between 0 and 7.")
+      .max(7, "Home exercise days per week must be between 0 and 7."),
+    follows_weight_bearing_guidance: z.boolean({
+      required_error: "Please confirm weight-bearing guidance status.",
+      invalid_type_error: "Weight-bearing guidance must be true or false.",
+    }),
+  })
+  .superRefine((values, context) => {
+    const bmi = calculateBmi(values.height_cm, values.weight_kg);
+
+    if (bmi < 10 || bmi > 60) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Height and weight must calculate to a BMI from 10.0 to 60.0.",
+        path: ["weight_kg"],
+      });
+    }
+  });
+
+export function calculateBmi(heightCm: number, weightKg: number) {
+  const heightMeters = heightCm / 100;
+  return Number((weightKg / (heightMeters * heightMeters)).toFixed(1));
+}
+
+export function calculateNutritionScore(values: {
+  balanced_meals_per_day: number;
+  protein_servings_per_day: number;
+  hydration_cups_per_day: number;
+}) {
+  return clampScore(
+    Math.round(
+      (Math.min(values.balanced_meals_per_day, 3) / 3) * 4 +
+        (Math.min(values.protein_servings_per_day, 4) / 4) * 3 +
+        (Math.min(values.hydration_cups_per_day, 8) / 8) * 3,
+    ),
+  );
+}
+
+export function calculateRehabAdherence(values: {
+  rehab_sessions_per_week: number;
+  home_exercise_days_per_week: number;
+  follows_weight_bearing_guidance: boolean;
+}) {
+  return clampScore(
+    Math.round(
+      (values.rehab_sessions_per_week / 7) * 4 +
+        (values.home_exercise_days_per_week / 7) * 4 +
+        (values.follows_weight_bearing_guidance ? 2 : 0),
+    ),
+  );
+}
+
+export function buildPatientInputFromIntake(values: PatientIntakeFormValues): PatientInput {
+  return {
+    age: values.age,
+    fracture_type: values.fracture_type,
+    bone_affected: values.bone_affected,
+    bmi: calculateBmi(values.height_cm, values.weight_kg),
+    nutrition_score: calculateNutritionScore(values),
+    rehab_adherence: calculateRehabAdherence(values),
+    diabetes: values.diabetes,
+    osteoporosis: values.osteoporosis,
+    smoker: values.smoker,
+  };
+}
+
+function clampScore(value: number) {
+  return Math.min(10, Math.max(1, value));
+}
+
 export const predictionResponseSchema = z.object({
   predicted_weeks: z.number().positive(),
   week_range_low: z.number().min(0),
@@ -97,4 +234,5 @@ export const predictionResponseSchema = z.object({
 });
 
 export type PatientInputFormValues = z.infer<typeof patientInputSchema>;
+export type PatientIntakeFormValues = z.infer<typeof patientIntakeSchema>;
 export type PredictionResponseSchema = z.infer<typeof predictionResponseSchema>;
