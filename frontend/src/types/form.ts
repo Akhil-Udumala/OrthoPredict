@@ -71,6 +71,14 @@ export const patientIntakeSchema = patientInputSchema
     rehab_adherence: true,
   })
   .extend({
+    patient_name: z
+      .string({
+        required_error: "Patient name is required.",
+        invalid_type_error: "Patient name must be text.",
+      })
+      .trim()
+      .min(1, "Patient name is required.")
+      .max(80, "Patient name must be 80 characters or less."),
     height_cm: z
       .number({
         required_error: "Height is required.",

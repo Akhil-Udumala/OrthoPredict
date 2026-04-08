@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ActivitySquare, ArrowLeft, HeartPulse, ShieldPlus } from "lucide-react";
+import { ActivitySquare, ArrowLeft, History, HeartPulse, ShieldPlus } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { LandingPage } from "@/app/LandingPage";
@@ -11,6 +11,12 @@ import { WhatIfSimulator } from "@/features/what-if-simulator/WhatIfSimulator";
 import { FrontendError } from "@/lib/api/errors";
 import { predictHealingTime } from "@/lib/api/predict";
 import { useAuth } from "@/lib/auth";
+import {
+  savePredictionHistory,
+  watchPredictionHistory,
+  type PredictionHistoryItem,
+} from "@/lib/predictionHistory";
+import { featureTitle, formatWeeks } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 import {
   clearPredictionSession,
@@ -36,6 +42,9 @@ export function App() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [simulationError, setSimulationError] = useState<string | null>(null);
   const [assetError, setAssetError] = useState<string | null>(null);
+  const [predictionHistory, setPredictionHistory] = useState<PredictionHistoryItem[]>([]);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
   const { isAuthReady, logout, user } = useAuth();
   const canUseProtectedRoute = isAuthReady && user !== null;
@@ -68,6 +77,30 @@ export function App() {
     document.documentElement.classList.remove("dark");
     document.documentElement.style.colorScheme = route === "landing" ? "dark" : "light";
   }, [route]);
+
+  useEffect(() => {
+    if (!user) {
+      setPredictionHistory([]);
+      setHistoryError(null);
+      setIsHistoryLoading(false);
+      return;
+    }
+
+    setIsHistoryLoading(true);
+    setHistoryError(null);
+
+    return watchPredictionHistory(
+      user.uid,
+      (history) => {
+        setPredictionHistory(history);
+        setIsHistoryLoading(false);
+      },
+      (error) => {
+        setHistoryError(getReadableErrorMessage(error));
+        setIsHistoryLoading(false);
+      },
+    );
+  }, [user]);
 
   useEffect(() => {
     if (!isAuthReady) {
@@ -142,6 +175,7 @@ export function App() {
       setSubmittedIntake(intakeValues);
       setPrediction(result);
       setPredictionSession(payload, result, intakeValues);
+      saveHistoryForCurrentDoctor(payload, result, intakeValues);
       setSimulation(null);
       setSimulationError(null);
       navigateTo("results");
@@ -150,6 +184,36 @@ export function App() {
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  function saveHistoryForCurrentDoctor(
+    payload: PatientInput,
+    result: PredictionResponse,
+    intakeValues: PatientIntakeFormValues,
+  ) {
+    if (!user) {
+      return;
+    }
+
+    void savePredictionHistory({
+      doctorId: user.uid,
+      doctorName: getDoctorDisplayName(user.displayName),
+      input: payload,
+      intake: intakeValues,
+      prediction: result,
+    }).catch((error: unknown) => {
+      setHistoryError(getReadableErrorMessage(error));
+    });
+  }
+
+  function openHistoryItem(item: PredictionHistoryItem) {
+    setSubmittedInput(item.input);
+    setSubmittedIntake(item.intake);
+    setPrediction(item.prediction);
+    setPredictionSession(item.input, item.prediction, item.intake);
+    setSimulation(null);
+    setSimulationError(null);
+    navigateTo("results");
   }
 
   async function handleSimulationRequest(
@@ -277,8 +341,12 @@ export function App() {
                 <FormPage
                   apiError={apiError}
                   formRef={formRef}
+                  history={predictionHistory}
+                  historyError={historyError}
                   initialValues={submittedIntake}
+                  isHistoryLoading={isHistoryLoading}
                   isSubmitting={isSubmitting}
+                  onOpenHistory={openHistoryItem}
                   onSubmit={handlePredictionRequest}
                 />
               ) : (
@@ -340,16 +408,24 @@ function getRouteFromLocation(): AppRoute {
 interface FormPageProps {
   apiError: string | null;
   formRef: React.RefObject<HTMLDivElement>;
+  history: PredictionHistoryItem[];
+  historyError: string | null;
   initialValues: PatientIntakeFormValues | null;
+  isHistoryLoading: boolean;
   isSubmitting: boolean;
+  onOpenHistory: (item: PredictionHistoryItem) => void;
   onSubmit: (payload: PatientInput, intakeValues: PatientIntakeFormValues) => Promise<void>;
 }
 
 function FormPage({
   apiError,
   formRef,
+  history,
+  historyError,
   initialValues,
+  isHistoryLoading,
   isSubmitting,
+  onOpenHistory,
   onSubmit,
 }: FormPageProps) {
   return (
@@ -433,8 +509,100 @@ function FormPage({
           initialValues={initialValues}
         />
       </div>
+
+      <PredictionHistoryPanel
+        error={historyError}
+        history={history}
+        isLoading={isHistoryLoading}
+        onOpenHistory={onOpenHistory}
+      />
     </>
   );
+}
+
+interface PredictionHistoryPanelProps {
+  error: string | null;
+  history: PredictionHistoryItem[];
+  isLoading: boolean;
+  onOpenHistory: (item: PredictionHistoryItem) => void;
+}
+
+function PredictionHistoryPanel({
+  error,
+  history,
+  isLoading,
+  onOpenHistory,
+}: PredictionHistoryPanelProps) {
+  return (
+    <section className="mt-8 rounded-[2rem] border border-border/70 bg-card/75 p-5 shadow-soft backdrop-blur sm:p-7">
+      <div className="flex flex-col gap-4 border-b border-border/70 pb-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
+            Prediction History
+          </p>
+          <h2 className="mt-2 text-2xl font-bold text-foreground">
+            Your recent patient predictions
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+            Saved automatically for the signed-in doctor after each successful model response.
+          </p>
+        </div>
+        <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <History className="h-6 w-6" />
+        </div>
+      </div>
+
+      {error ? (
+        <div className="mt-5 rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm leading-6 text-destructive">
+          {error}
+        </div>
+      ) : null}
+
+      {isLoading ? (
+        <p className="mt-5 text-sm text-muted-foreground">Loading prediction history…</p>
+      ) : null}
+
+      {!isLoading && history.length === 0 ? (
+        <div className="mt-5 rounded-2xl border border-dashed border-border bg-secondary/35 px-4 py-5 text-sm leading-6 text-muted-foreground">
+          No saved predictions yet. Submit a patient profile and it will appear here.
+        </div>
+      ) : null}
+
+      {history.length > 0 ? (
+        <div className="mt-5 grid gap-3">
+          {history.map((item) => (
+            <div
+              key={item.id}
+              className="flex flex-col gap-4 rounded-[1.5rem] border border-border/70 bg-card/85 p-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <h3 className="font-semibold text-foreground">{item.patientName}</h3>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  {formatHistoryDate(item.createdAtMs)} · {featureTitle(item.input.fracture_type)}{" "}
+                  {featureTitle(item.input.bone_affected)} · {formatWeeks(item.prediction.predicted_weeks)}
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => onOpenHistory(item)}
+              >
+                Open result
+              </Button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function formatHistoryDate(createdAtMs: number) {
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(createdAtMs));
 }
 
 interface ResultsPageProps {
@@ -488,6 +656,7 @@ function ResultsPage({
       <ResultCard
         result={prediction}
         submittedInput={submittedInput}
+        submittedIntake={submittedIntake}
         onEditInputs={onBackToForm}
       />
       <WhatIfSimulator

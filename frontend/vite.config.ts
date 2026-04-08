@@ -14,6 +14,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
+          "firebase-vendor": ["firebase/app", "firebase/auth", "firebase/firestore"],
           "form-vendor": ["react-hook-form", "@hookform/resolvers", "zod", "axios"],
           "ui-vendor": [
             "@radix-ui/react-dialog",

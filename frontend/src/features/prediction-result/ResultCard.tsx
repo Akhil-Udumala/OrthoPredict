@@ -10,6 +10,7 @@ import {
   getCategoryLabel,
 } from "@/lib/formatters";
 import type { PatientInput, PredictionResponse } from "@/types/api";
+import type { PatientIntakeFormValues } from "@/types/form";
 import { ProbabilityChart } from "./ProbabilityChart";
 import { TopFeaturesList } from "./TopFeaturesList";
 import { RehabTips } from "./RehabTips";
@@ -19,12 +20,18 @@ import { PrintExportButton } from "@/features/print-export/PrintExportButton";
 interface ResultCardProps {
   result: PredictionResponse;
   submittedInput: PatientInput;
+  submittedIntake: PatientIntakeFormValues | null;
   onEditInputs: () => void;
 }
 
-export function ResultCard({ result, submittedInput, onEditInputs }: ResultCardProps) {
+export function ResultCard({
+  result,
+  submittedInput,
+  submittedIntake,
+  onEditInputs,
+}: ResultCardProps) {
   const categoryMeta = categoryCopy[result.category];
-  const patientSummary = buildPatientSummary(submittedInput);
+  const patientSummary = buildPatientSummary(submittedInput, submittedIntake?.patient_name);
 
   return (
     <motion.section

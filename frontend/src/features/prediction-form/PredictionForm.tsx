@@ -119,6 +119,21 @@ export function PredictionForm({
         })}
       >
         <FieldGroup
+          label="Patient Name"
+          htmlFor="patient_name"
+          helper="Used only for this doctor's prediction history and print summary."
+          error={errors.patient_name?.message}
+        >
+          <Input
+            id="patient_name"
+            type="text"
+            autoComplete="off"
+            placeholder="Patient full name"
+            {...register("patient_name")}
+          />
+        </FieldGroup>
+
+        <FieldGroup
           label="Age"
           htmlFor="age"
           helper="Whole number from 1 to 110."
@@ -422,6 +437,7 @@ function buildIntakeValuesFromPatientInput(input: PatientInput): PatientIntakeFo
   const weightKg = Number((input.bmi * (heightCm / 100) ** 2).toFixed(1));
 
   return {
+    patient_name: "",
     age: input.age,
     fracture_type: input.fracture_type,
     bone_affected: input.bone_affected,

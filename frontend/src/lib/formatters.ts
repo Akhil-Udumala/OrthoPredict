@@ -30,8 +30,9 @@ export function describeBoolean(value: boolean) {
   return value ? "Yes" : "No";
 }
 
-export function buildPatientSummary(input: PatientInput) {
+export function buildPatientSummary(input: PatientInput, patientName?: string | null) {
   return [
+    { label: "Patient Name", value: patientName?.trim() || "Not recorded" },
     { label: "Age", value: `${input.age}` },
     { label: "Fracture Type", value: featureTitle(input.fracture_type) },
     { label: "Bone Affected", value: featureTitle(input.bone_affected) },
