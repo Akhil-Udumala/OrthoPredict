@@ -81,3 +81,11 @@ export function setPredictionSession(
     JSON.stringify({ input, intake, prediction }),
   );
 }
+
+export function clearPredictionSession() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.sessionStorage.removeItem(PREDICTION_SESSION_STORAGE_KEY);
+}

@@ -38,7 +38,7 @@ export function HeroSection() {
 
                 <div className="mt-12 flex flex-col items-center justify-center gap-2 sm:flex-row lg:justify-start">
                   <Button asChild size="lg" className="h-12 rounded-full pl-5 pr-3 text-base">
-                    <Link href="/predict">
+                    <Link href="/login">
                       <span className="text-nowrap">Start prediction</span>
                       <ChevronRight className="ml-1" />
                     </Link>
@@ -223,7 +223,7 @@ const HeroHeader = () => {
                   </Link>
                 </Button>
                 <Button asChild size="sm">
-                  <Link href="/predict">
+                  <Link href="/login">
                     <span>Open app</span>
                   </Link>
                 </Button>

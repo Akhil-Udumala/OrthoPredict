@@ -3,14 +3,17 @@ import { ActivitySquare, ArrowLeft, HeartPulse, ShieldPlus } from "lucide-react"
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { LandingPage } from "@/app/LandingPage";
+import { LoginPage } from "@/app/LoginPage";
 import { DisclaimerModal } from "@/features/disclaimer/DisclaimerModal";
 import { PredictionForm } from "@/features/prediction-form/PredictionForm";
 import { ResultCard } from "@/features/prediction-result/ResultCard";
 import { WhatIfSimulator } from "@/features/what-if-simulator/WhatIfSimulator";
 import { FrontendError } from "@/lib/api/errors";
 import { predictHealingTime } from "@/lib/api/predict";
+import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import {
+  clearPredictionSession,
   getPredictionSession,
   hasSeenDisclaimer,
   setDisclaimerSeen,
@@ -19,7 +22,7 @@ import {
 import type { PatientInput, PredictionResponse } from "@/types/api";
 import type { PatientIntakeFormValues } from "@/types/form";
 
-type AppRoute = "landing" | "form" | "results";
+type AppRoute = "landing" | "login" | "form" | "results";
 
 export function App() {
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
@@ -34,6 +37,8 @@ export function App() {
   const [simulationError, setSimulationError] = useState<string | null>(null);
   const [assetError, setAssetError] = useState<string | null>(null);
   const formRef = useRef<HTMLDivElement>(null);
+  const { isAuthReady, logout, user } = useAuth();
+  const canUseProtectedRoute = isAuthReady && user !== null;
 
   useEffect(() => {
     setDisclaimerAccepted(hasSeenDisclaimer());
@@ -63,6 +68,21 @@ export function App() {
     document.documentElement.classList.remove("dark");
     document.documentElement.style.colorScheme = route === "landing" ? "dark" : "light";
   }, [route]);
+
+  useEffect(() => {
+    if (!isAuthReady) {
+      return;
+    }
+
+    if (!user && (route === "form" || route === "results")) {
+      navigateTo("login");
+      return;
+    }
+
+    if (user && route === "login") {
+      navigateTo("form");
+    }
+  }, [isAuthReady, route, user]);
 
   useEffect(() => {
     function setFrontendAssetError(url?: string | null) {
@@ -163,9 +183,26 @@ export function App() {
     setDisclaimerAccepted(true);
   }
 
+  async function handleSignOut() {
+    await logout();
+    clearPredictionSession();
+    setSubmittedInput(null);
+    setSubmittedIntake(null);
+    setPrediction(null);
+    setSimulation(null);
+    setSimulationError(null);
+    navigateTo("login");
+  }
+
   function navigateTo(nextRoute: AppRoute) {
     const nextPath =
-      nextRoute === "results" ? "/results" : nextRoute === "form" ? "/predict" : "/";
+      nextRoute === "results"
+        ? "/results"
+        : nextRoute === "form"
+          ? "/predict"
+          : nextRoute === "login"
+            ? "/login"
+            : "/";
 
     if (window.location.pathname !== nextPath) {
       window.history.pushState({}, "", nextPath);
@@ -182,61 +219,101 @@ export function App() {
     <div
       className={cn(
         "min-h-screen text-foreground",
-        route === "landing" ? "bg-[#061115]" : "bg-mesh-glow",
+        route === "landing"
+          ? "bg-[#061115]"
+          : route === "login"
+            ? "bg-[#f9f9fb]"
+            : "bg-mesh-glow",
       )}
     >
       {route === "landing" ? <LandingPage /> : null}
+      {route === "login" ? <LoginPage onAuthenticated={() => navigateTo("form")} /> : null}
 
-      {route !== "landing" ? (
-        <>
-          <DisclaimerModal open={!disclaimerAccepted} onAccept={acceptDisclaimer} />
+      {route !== "landing" && route !== "login" ? (
+        !canUseProtectedRoute ? (
+          <AuthLoadingState
+            message={isAuthReady ? "Redirecting to sign in…" : "Checking secure access…"}
+          />
+        ) : (
+          <>
+            <DisclaimerModal open={!disclaimerAccepted} onAccept={acceptDisclaimer} />
 
-          <header className="sticky top-0 z-30 border-b border-border/70 bg-card/75 backdrop-blur">
-            <div className="container py-4">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary">
-                    OrthoPredict
-                  </p>
-                  <h1 className="text-lg font-bold text-foreground">
-                    Bone fracture healing time prediction
-                  </h1>
+            <header className="sticky top-0 z-30 border-b border-border/70 bg-card/75 backdrop-blur">
+              <div className="container py-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary">
+                      OrthoPredict
+                    </p>
+                    <h1 className="text-lg font-bold text-foreground">
+                      Bone fracture healing time prediction
+                    </h1>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <p className="hidden max-w-48 truncate text-sm text-muted-foreground sm:block">
+                      {getDoctorDisplayName(user.displayName)}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => void handleSignOut()}
+                    >
+                      Sign out
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </header>
+            </header>
 
-          <main className="container pb-12 pt-8 sm:pb-16 sm:pt-10">
-            {assetError ? (
-              <section className="mb-6 rounded-[1.5rem] border border-amber-500/25 bg-amber-500/10 px-5 py-4 text-sm leading-6 text-amber-800 dark:text-amber-200">
-                {assetError}
-              </section>
-            ) : null}
+            <main className="container pb-12 pt-8 sm:pb-16 sm:pt-10">
+              {assetError ? (
+                <section className="mb-6 rounded-[1.5rem] border border-amber-500/25 bg-amber-500/10 px-5 py-4 text-sm leading-6 text-amber-800 dark:text-amber-200">
+                  {assetError}
+                </section>
+              ) : null}
 
-            {route === "form" ? (
-              <FormPage
-                apiError={apiError}
-                formRef={formRef}
-                initialValues={submittedIntake}
-                isSubmitting={isSubmitting}
-                onSubmit={handlePredictionRequest}
-              />
-            ) : (
-              <ResultsPage
-                prediction={prediction}
-                simulation={simulation}
-                simulationError={simulationError}
-                submittedIntake={submittedIntake}
-                submittedInput={submittedInput}
-                isSimulating={isSimulating}
-                onBackToForm={() => navigateTo("form")}
-                onSimulate={handleSimulationRequest}
-              />
-            )}
-          </main>
-        </>
+              {route === "form" ? (
+                <FormPage
+                  apiError={apiError}
+                  formRef={formRef}
+                  initialValues={submittedIntake}
+                  isSubmitting={isSubmitting}
+                  onSubmit={handlePredictionRequest}
+                />
+              ) : (
+                <ResultsPage
+                  prediction={prediction}
+                  simulation={simulation}
+                  simulationError={simulationError}
+                  submittedIntake={submittedIntake}
+                  submittedInput={submittedInput}
+                  isSimulating={isSimulating}
+                  onBackToForm={() => navigateTo("form")}
+                  onSimulate={handleSimulationRequest}
+                />
+              )}
+            </main>
+          </>
+        )
       ) : null}
     </div>
+  );
+}
+
+function getDoctorDisplayName(displayName: string | null) {
+  const name = displayName?.trim();
+
+  return name ? `Dr. ${name.replace(/^dr\.?\s+/i, "")}` : "Doctor";
+}
+
+function AuthLoadingState({ message }: { message: string }) {
+  return (
+    <main className="container flex min-h-screen items-center justify-center">
+      <div className="rounded-[2rem] border border-border/70 bg-card/80 px-6 py-5 text-sm text-muted-foreground shadow-soft backdrop-blur">
+        {message}
+      </div>
+    </main>
   );
 }
 
@@ -251,6 +328,10 @@ function getRouteFromLocation(): AppRoute {
 
   if (window.location.pathname.endsWith("/predict")) {
     return "form";
+  }
+
+  if (window.location.pathname.endsWith("/login")) {
+    return "login";
   }
 
   return "landing";

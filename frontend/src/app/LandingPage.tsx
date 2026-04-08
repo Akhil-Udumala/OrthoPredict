@@ -105,7 +105,7 @@ export function LandingPage() {
             <h2 className="mt-3 text-3xl font-bold tracking-tight">Open the prediction app.</h2>
           </div>
           <a
-            href="/predict"
+            href="/login"
             className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-6 text-base font-semibold text-primary-foreground shadow-soft transition hover:bg-primary/90"
           >
             Start prediction
