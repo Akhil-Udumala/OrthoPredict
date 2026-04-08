@@ -36,10 +36,6 @@ export function DisclaimerModal({ open, onAccept }: DisclaimerModalProps) {
               remain with a qualified clinician who can consider the full patient context.
             </p>
           </div>
-          <p className="text-sm leading-6 text-muted-foreground">
-            This notice is shown once per browser session and stored only in
-            <code className="mx-1 rounded bg-background px-1.5 py-0.5 text-xs">sessionStorage</code>.
-          </p>
         </div>
 
         <div className="mt-8 flex justify-end">
