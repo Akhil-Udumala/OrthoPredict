@@ -2,6 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { ActivitySquare, ArrowLeft, History, HeartPulse, ShieldPlus } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { LandingPage } from "@/app/LandingPage";
 import { LoginPage } from "@/app/LoginPage";
 import { DisclaimerModal } from "@/features/disclaimer/DisclaimerModal";
@@ -317,6 +325,12 @@ export function App() {
                     <p className="hidden max-w-48 truncate text-sm text-muted-foreground sm:block">
                       {getDoctorDisplayName(user.displayName)}
                     </p>
+                    <PredictionHistoryDialog
+                      error={historyError}
+                      history={predictionHistory}
+                      isLoading={isHistoryLoading}
+                      onOpenHistory={openHistoryItem}
+                    />
                     <Button
                       type="button"
                       variant="outline"
@@ -341,12 +355,8 @@ export function App() {
                 <FormPage
                   apiError={apiError}
                   formRef={formRef}
-                  history={predictionHistory}
-                  historyError={historyError}
                   initialValues={submittedIntake}
-                  isHistoryLoading={isHistoryLoading}
                   isSubmitting={isSubmitting}
-                  onOpenHistory={openHistoryItem}
                   onSubmit={handlePredictionRequest}
                 />
               ) : (
@@ -408,24 +418,16 @@ function getRouteFromLocation(): AppRoute {
 interface FormPageProps {
   apiError: string | null;
   formRef: React.RefObject<HTMLDivElement>;
-  history: PredictionHistoryItem[];
-  historyError: string | null;
   initialValues: PatientIntakeFormValues | null;
-  isHistoryLoading: boolean;
   isSubmitting: boolean;
-  onOpenHistory: (item: PredictionHistoryItem) => void;
   onSubmit: (payload: PatientInput, intakeValues: PatientIntakeFormValues) => Promise<void>;
 }
 
 function FormPage({
   apiError,
   formRef,
-  history,
-  historyError,
   initialValues,
-  isHistoryLoading,
   isSubmitting,
-  onOpenHistory,
   onSubmit,
 }: FormPageProps) {
   return (
@@ -509,92 +511,90 @@ function FormPage({
           initialValues={initialValues}
         />
       </div>
-
-      <PredictionHistoryPanel
-        error={historyError}
-        history={history}
-        isLoading={isHistoryLoading}
-        onOpenHistory={onOpenHistory}
-      />
     </>
   );
 }
 
-interface PredictionHistoryPanelProps {
+interface PredictionHistoryDialogProps {
   error: string | null;
   history: PredictionHistoryItem[];
   isLoading: boolean;
   onOpenHistory: (item: PredictionHistoryItem) => void;
 }
 
-function PredictionHistoryPanel({
+function PredictionHistoryDialog({
   error,
   history,
   isLoading,
   onOpenHistory,
-}: PredictionHistoryPanelProps) {
+}: PredictionHistoryDialogProps) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <section className="mt-8 rounded-[2rem] border border-border/70 bg-card/75 p-5 shadow-soft backdrop-blur sm:p-7">
-      <div className="flex flex-col gap-4 border-b border-border/70 pb-5 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
-            Prediction History
-          </p>
-          <h2 className="mt-2 text-2xl font-bold text-foreground">
-            Your recent patient predictions
-          </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Saved automatically for the signed-in doctor after each successful model response.
-          </p>
-        </div>
-        <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-          <History className="h-6 w-6" />
-        </div>
-      </div>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button type="button" variant="outline" size="sm">
+          <History className="h-4 w-4" />
+          History
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>Prediction history</DialogTitle>
+          <DialogDescription>
+            Your recent patient predictions are saved automatically after each successful model
+            response.
+          </DialogDescription>
+        </DialogHeader>
 
-      {error ? (
-        <div className="mt-5 rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm leading-6 text-destructive">
-          {error}
-        </div>
-      ) : null}
+        {error ? (
+          <div className="mt-5 rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm leading-6 text-destructive">
+            {error}
+          </div>
+        ) : null}
 
-      {isLoading ? (
-        <p className="mt-5 text-sm text-muted-foreground">Loading prediction history…</p>
-      ) : null}
+        {isLoading ? (
+          <p className="mt-5 text-sm text-muted-foreground">Loading prediction history…</p>
+        ) : null}
 
-      {!isLoading && history.length === 0 ? (
-        <div className="mt-5 rounded-2xl border border-dashed border-border bg-secondary/35 px-4 py-5 text-sm leading-6 text-muted-foreground">
-          No saved predictions yet. Submit a patient profile and it will appear here.
-        </div>
-      ) : null}
+        {!isLoading && history.length === 0 ? (
+          <div className="mt-5 rounded-2xl border border-dashed border-border bg-secondary/35 px-4 py-5 text-sm leading-6 text-muted-foreground">
+            No saved predictions yet. Submit a patient profile and it will appear here.
+          </div>
+        ) : null}
 
-      {history.length > 0 ? (
-        <div className="mt-5 grid gap-3">
-          {history.map((item) => (
-            <div
-              key={item.id}
-              className="flex flex-col gap-4 rounded-[1.5rem] border border-border/70 bg-card/85 p-4 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div>
-                <h3 className="font-semibold text-foreground">{item.patientName}</h3>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  {formatHistoryDate(item.createdAtMs)} · {featureTitle(item.input.fracture_type)}{" "}
-                  {featureTitle(item.input.bone_affected)} · {formatWeeks(item.prediction.predicted_weeks)}
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => onOpenHistory(item)}
+        {history.length > 0 ? (
+          <div className="mt-5 grid max-h-[60vh] gap-3 overflow-y-auto pr-1">
+            {history.map((item) => (
+              <div
+                key={item.id}
+                className="flex flex-col gap-4 rounded-[1.5rem] border border-border/70 bg-card/85 p-4 sm:flex-row sm:items-center sm:justify-between"
               >
-                Open result
-              </Button>
-            </div>
-          ))}
-        </div>
-      ) : null}
-    </section>
+                <div>
+                  <h3 className="font-semibold text-foreground">{item.patientName}</h3>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    {formatHistoryDate(item.createdAtMs)} · {featureTitle(item.input.fracture_type)}{" "}
+                    {featureTitle(item.input.bone_affected)} ·{" "}
+                    {formatWeeks(item.prediction.predicted_weeks)}
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setOpen(false);
+                    onOpenHistory(item);
+                  }}
+                >
+                  Open result
+                </Button>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </DialogContent>
+    </Dialog>
   );
 }
 
