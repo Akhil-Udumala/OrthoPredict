@@ -4,7 +4,7 @@ End-to-end ML application that predicts fracture healing duration (weeks) from s
 
 > Portfolio project: ML pipeline + FastAPI backend + React frontend with schema-aligned inference.
 
-## Recruiter Quick View
+## Quick View
 
 - Goal: estimate personalized fracture healing time.
 - Input: 9 clinical features (age, fracture type, bone, BMI, nutrition, rehab adherence, diabetes, osteoporosis, smoker).
@@ -24,8 +24,6 @@ flowchart LR
 ```
 
 ## Project Screenshots
-
-Add screenshots to `docs/screenshots/` with the exact filenames below to render them in this section.
 
 ### Landing Page
 
@@ -159,11 +157,8 @@ payload = {
 print(predict_from_payload(payload))
 ```
 
-## Notes
-
-- `ml/artifacts/model.joblib` may exceed GitHub's 100 MB file limit.
-- Keep artifacts local/reproducible, or use Git LFS for versioning large binaries.
-- This project is for educational and portfolio use and is not a clinical diagnostic tool.
+## Note
+- This project is for educational and portfolio use and decision-support tool. Not a clinical diagnostic tool.
 
 ## Author
 
