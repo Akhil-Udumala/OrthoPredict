@@ -29,9 +29,34 @@ class ModelService:
     model_version: str
     date_trained: str
 
+    @staticmethod
+    def _ensure_artifacts_exist() -> None:
+        required = (MODEL_PATH, FEATURES_PATH, METRICS_PATH)
+        missing = [path for path in required if not path.exists()]
+        if not missing:
+            return
+
+        try:
+            from ml.train_model import main as train_main
+
+            # Bootstrap artifacts on first run for local/dev environments.
+            train_main()
+        except Exception as exc:  # pragma: no cover - startup guard
+            missing_paths = ", ".join(str(path) for path in missing)
+            raise RuntimeError(
+                f"Failed to generate missing artifacts ({missing_paths}). "
+                "Run `python3 ml/train_model.py` and retry."
+            ) from exc
+
     @classmethod
     def load(cls) -> "ModelService":
-        for path in (MODEL_PATH, FEATURES_PATH, METRICS_PATH, SCHEMA_PATH):
+        for path in (SCHEMA_PATH,):
+            if not path.exists():
+                raise RuntimeError(f"Required artifact is missing: {path}")
+
+        cls._ensure_artifacts_exist()
+
+        for path in (MODEL_PATH, FEATURES_PATH, METRICS_PATH):
             if not path.exists():
                 raise RuntimeError(f"Required artifact is missing: {path}")
 
