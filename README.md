@@ -52,9 +52,14 @@ flowchart LR
 
 ## Tech Stack
 
-- ML: Python, pandas, scikit-learn, joblib
-- Backend: FastAPI, Uvicorn, Pydantic
-- Frontend: React, TypeScript, Vite, Tailwind, shadcn/ui, zod, react-hook-form, axios, chart.js, framer-motion
+- ML/Data Science: Python, pandas, NumPy, scikit-learn, joblib
+- Backend/API: FastAPI, Pydantic, Uvicorn, Starlette CORS middleware
+- Frontend Core: React 18, TypeScript, Vite
+- Frontend UI: Tailwind CSS, Radix UI primitives, shadcn/ui patterns, Lucide icons
+- Frontend Forms/Validation: react-hook-form, @hookform/resolvers, Zod
+- Frontend Data/Visualization: Axios, Chart.js, react-chartjs-2
+- Frontend Motion/Auth: Framer Motion, Firebase (Auth + Firestore)
+- Testing: pytest, FastAPI TestClient
 
 ## Repository Structure
 
